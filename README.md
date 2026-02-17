@@ -7,6 +7,7 @@ Context-Aware AI Chat: Ask legal queries in natural language (Voice/Text) and ge
 Strict Anti-Hallucination: Unlike generic chatbots, LawSphere refuses to answer if the information is not found in the legal statute.
 Multi-Lingual Support: Switch between English and Hindi (Devanagari) for AI responses.
 Compare Laws Tool: AI-powered comparison tables (e.g., "Theft vs. Extortion") highlighting differences in punishment, cognizance, and bail.
+
 📸 **Novelty Features**
 
 📷 **Legal Lens (OCR)**: Scan physical legal documents (FIRs, Court Notices) using the camera. The AI analyzes the scanned text and summarizes it instantly.
