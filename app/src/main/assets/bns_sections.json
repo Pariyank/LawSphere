@@ -1,0 +1,41 @@
+[
+  {
+    "chapter": "VI",
+    "section": "103",
+    "title": "Punishment for Murder",
+    "description": "Whoever commits murder shall be punished with death or imprisonment for life, and shall also be liable to fine.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Death or Life Imprisonment + Fine",
+    "cases": [
+      "Bachan Singh v. State of Punjab (Rarest of Rare Doctrine)",
+      "K.M. Nanavati v. State of Maharashtra (Grave & Sudden Provocation)"
+    ]
+  },
+  {
+    "chapter": "XVII",
+    "section": "303",
+    "title": "Theft",
+    "description": "Whoever, intending to take dishonestly any movable property out of the possession of any person without that person's consent, moves that property in order to such taking, is said to commit theft.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Imprisonment up to 3 years or fine or both",
+    "cases": [
+      "Pyare Lal Bhargava v. State of Rajasthan",
+      "K.N. Mehra v. State of Rajasthan"
+    ]
+  },
+  {
+    "chapter": "V",
+    "section": "69",
+    "title": "Sexual Intercourse by Deceitful Means",
+    "description": "Sexual intercourse by employing deceitful means or making false promise to marry.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Imprisonment up to 10 years + Fine",
+    "cases": [
+      "Anurag Soni v. State of Chhattisgarh",
+      "Deelip Singh v. State of Bihar"
+    ]
+  }
+]

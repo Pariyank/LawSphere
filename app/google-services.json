@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "395261422786",
+    "project_id": "lawsphere-law",
+    "storage_bucket": "lawsphere-law.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:395261422786:android:3365af9517c33c7f4e1f5b",
+        "android_client_info": {
+          "package_name": "com.example.lawsphere"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPbDbFyGkVxygpr7PUCZwkc9Z144RGHMQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
