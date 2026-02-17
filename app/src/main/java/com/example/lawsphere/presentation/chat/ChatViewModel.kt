@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.lawsphere.data.api.LawApi
 import com.example.lawsphere.data.model.ChatRequest
 import com.example.lawsphere.data.model.CompareRequest
+import com.example.lawsphere.data.utils.AppPreferences // 🟢 Import
 import com.example.lawsphere.domain.model.ChatMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -19,18 +20,16 @@ class ChatViewModel @Inject constructor(
     private val api: LawApi
 ) : ViewModel() {
 
-    // 🟢 State 1: For the Main Chat Tab (History)
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
     val messages = _messages.asStateFlow()
 
-    // 🟢 State 2: For the Compare Tool (Single Result)
     private val _comparisonResult = MutableStateFlow<String?>(null)
     val comparisonResult = _comparisonResult.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-    // ================= ASK (Main Chat) =================
+    // ================= ASK =================
     fun sendMessage(query: String) {
         if (query.isBlank()) return
 
@@ -39,8 +38,11 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                // 🟢 Determine Language
+                val lang = if (AppPreferences.isHindiMode) "hindi" else "english"
+
                 val response = withContext(Dispatchers.IO) {
-                    api.chatWithLawSphere(ChatRequest(query = query))
+                    api.chatWithLawSphere(ChatRequest(query = query, language = lang))
                 }
 
                 val sourceList = response.retrievedSources?.map {
@@ -64,11 +66,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    // ================= COMPARE (Compare Tool) =================
+    // ================= COMPARE =================
     fun compareSections(section1: String, section2: String) {
         if (section1.isBlank() || section2.isBlank()) return
-
-        // Clear previous result
         _comparisonResult.value = null
 
         viewModelScope.launch {
@@ -77,8 +77,6 @@ class ChatViewModel @Inject constructor(
                 val response = withContext(Dispatchers.IO) {
                     api.compareSections(CompareRequest(section1, section2))
                 }
-
-                // 🟢 Update the specific comparison state, NOT the chat history
                 _comparisonResult.value = response.formattedAnswer ?: "Comparison failed."
 
             } catch (e: Exception) {
@@ -89,7 +87,6 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    // Helper to clear comparison when leaving screen
     fun clearComparison() {
         _comparisonResult.value = null
     }

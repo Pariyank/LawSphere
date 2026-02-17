@@ -1,7 +1,8 @@
 package com.example.lawsphere.data.model
 
 data class ChatRequest(
-    val query: String
+    val query: String,
+    val language: String = "english" // 🟢 Added
 )
 
 data class CompareRequest(
@@ -18,6 +19,5 @@ data class ChatResponse(
     val formattedAnswer: String? = "No response generated.",
     val reasoning: String? = "",
     val semanticTags: List<String>? = emptyList(),
-    // 🟢 The ViewModel now correctly accesses this field
     val retrievedSources: List<RetrievedSource>? = emptyList()
 )
