@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.BusinessCenter
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Gavel
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
@@ -18,6 +19,7 @@ import com.example.lawsphere.presentation.awareness.CitizenGuideScreen
 import com.example.lawsphere.presentation.awareness.MapsScreen
 import com.example.lawsphere.presentation.chat.AccentGold
 import com.example.lawsphere.presentation.chat.ChatScreen
+import com.example.lawsphere.presentation.community.CommunityScreen
 import com.example.lawsphere.presentation.dashboard.CaseDashboardScreen
 import com.example.lawsphere.presentation.drafting.DraftingScreen
 import com.example.lawsphere.presentation.explorer.RoadmapScreen
@@ -31,6 +33,7 @@ sealed class BottomNavItem(val title: String, val icon: ImageVector) {
     object Dashboard : BottomNavItem("Cases", Icons.Default.BusinessCenter)
     object Guide : BottomNavItem("Help", Icons.Default.Info)
 
+    object Community : BottomNavItem("Community", Icons.Default.Groups)
     object Profile : BottomNavItem("Profile", Icons.Default.Person)
 }
 
@@ -42,6 +45,7 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
             listOf(
                 BottomNavItem.Chat,
                 BottomNavItem.Explorer,
+                BottomNavItem.Community,
                 BottomNavItem.Drafting,
                 BottomNavItem.Dashboard,
                 BottomNavItem.Profile
@@ -50,6 +54,7 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
             listOf(
                 BottomNavItem.Chat,
                 BottomNavItem.Explorer,
+                BottomNavItem.Community,
                 BottomNavItem.Drafting,
                 BottomNavItem.Guide,
                 BottomNavItem.Profile
@@ -59,7 +64,6 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
 
     var currentTab by remember { mutableStateOf<BottomNavItem>(BottomNavItem.Chat) }
 
-    // 🟢 Sub-screen states
     var showMap by remember { mutableStateOf(false) }
     var showRoadmap by remember { mutableStateOf(false) }
     var showCompare by remember { mutableStateOf(false) }
@@ -142,6 +146,7 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
                             )
 
                         BottomNavItem.Profile -> ProfileScreen(onLogout = onLogout)
+                        BottomNavItem.Community -> CommunityScreen(userRole = userRole)
                     }
                 }
             }
