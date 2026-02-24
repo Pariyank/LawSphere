@@ -33,11 +33,9 @@ fun CompareScreen(
     var sectionB by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
 
-    // 🟢 Observes ONLY the comparison result, ignoring chat history
     val comparisonResult by viewModel.comparisonResult.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    // Clear result when entering/leaving to keep it fresh
     DisposableEffect(Unit) {
         onDispose {
             viewModel.clearComparison()
@@ -51,7 +49,7 @@ fun CompareScreen(
             .padding(16.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        // Header
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
@@ -61,7 +59,6 @@ fun CompareScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Inputs
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
                 value = sectionA,
@@ -92,10 +89,9 @@ fun CompareScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Compare Button
         Button(
             onClick = {
-                focusManager.clearFocus() // Hide keyboard
+                focusManager.clearFocus()
                 viewModel.compareSections(sectionA, sectionB)
             },
             modifier = Modifier.fillMaxWidth(),
@@ -111,7 +107,6 @@ fun CompareScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 🟢 Show Result only if comparisonResult is not null
         if (!comparisonResult.isNullOrEmpty()) {
             Card(
                 colors = CardDefaults.cardColors(containerColor = GlassSurface),

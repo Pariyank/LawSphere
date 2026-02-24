@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.lawsphere.data.utils.AppPreferences // 🟢 Import
+import com.example.lawsphere.data.utils.AppPreferences
 import com.example.lawsphere.presentation.chat.AccentGold
 import com.example.lawsphere.presentation.chat.GlassDark
 import com.example.lawsphere.presentation.chat.GlassSurface
@@ -31,7 +31,6 @@ fun ProfileScreen(onLogout: () -> Unit) {
     var userName by remember { mutableStateOf("Loading...") }
     var userRole by remember { mutableStateOf("Loading...") }
 
-    // 🟢 Load initial state from Singleton
     var isHindiMode by remember { mutableStateOf(AppPreferences.isHindiMode) }
 
     LaunchedEffect(Unit) {
@@ -53,7 +52,6 @@ fun ProfileScreen(onLogout: () -> Unit) {
     ) {
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Avatar
         Box(
             modifier = Modifier
                 .size(100.dp)
@@ -72,7 +70,6 @@ fun ProfileScreen(onLogout: () -> Unit) {
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        // Settings Card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = GlassSurface),
@@ -82,7 +79,6 @@ fun ProfileScreen(onLogout: () -> Unit) {
                 Text("Settings", color = Color.Gray, fontSize = 12.sp)
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Language Toggle
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -93,7 +89,7 @@ fun ProfileScreen(onLogout: () -> Unit) {
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text("Hindi Responses", color = Color.White, fontSize = 16.sp)
-                            // 🟢 Dynamic Text
+
                             Text(
                                 if (isHindiMode) "AI will reply in Hindi" else "AI will reply in English",
                                 color = Color.Gray,
@@ -105,7 +101,7 @@ fun ProfileScreen(onLogout: () -> Unit) {
                         checked = isHindiMode,
                         onCheckedChange = {
                             isHindiMode = it
-                            AppPreferences.isHindiMode = it // 🟢 Update Singleton
+                            AppPreferences.isHindiMode = it
                         },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = AccentGold,
@@ -118,7 +114,6 @@ fun ProfileScreen(onLogout: () -> Unit) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Logout
         Button(
             onClick = onLogout,
             modifier = Modifier.fillMaxWidth(),

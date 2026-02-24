@@ -25,7 +25,6 @@ class MainActivity : ComponentActivity() {
             var isLoggedIn by remember { mutableStateOf(auth.currentUser != null) }
             var userRole by remember { mutableStateOf("citizen") }
 
-            // ✅ Listen to Firebase auth state changes
             DisposableEffect(Unit) {
                 val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
                     isLoggedIn = firebaseAuth.currentUser != null
@@ -38,7 +37,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            // ✅ Fetch role when user logs in
             LaunchedEffect(isLoggedIn) {
                 if (isLoggedIn) {
                     val uid = auth.currentUser?.uid
@@ -57,7 +55,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            // ✅ UI Logic
             if (showSplash) {
 
                 SplashScreen(
@@ -71,7 +68,6 @@ class MainActivity : ComponentActivity() {
                     MainScreen(
                         userRole = userRole,
                         onLogout = {
-                            // ✅ Just sign out
                             auth.signOut()
                         }
                     )

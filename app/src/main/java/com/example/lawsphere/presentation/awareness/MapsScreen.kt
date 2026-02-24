@@ -30,17 +30,16 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.*
 
 @Composable
-fun MapsScreen(onBack: () -> Unit = {}) { // Added onBack callback
+fun MapsScreen(onBack: () -> Unit = {}) {
     val context = LocalContext.current
 
-    // Default View: Center of India (Nagpur approx)
     val indiaCenter = LatLng(21.1458, 79.0882)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(indiaCenter, 5f)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // 1. The Map View
+
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
@@ -50,12 +49,11 @@ fun MapsScreen(onBack: () -> Unit = {}) { // Added onBack callback
                 compassEnabled = false
             ),
             properties = MapProperties(
-                // Optional: Dark Mode Map Style JSON can be added here
-                isMyLocationEnabled = false // Set true if you handle permissions
+
+                isMyLocationEnabled = false
             )
         )
 
-        // 2. Back Button (Top Left)
         IconButton(
             onClick = onBack,
             modifier = Modifier
@@ -65,7 +63,7 @@ fun MapsScreen(onBack: () -> Unit = {}) { // Added onBack callback
             Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
         }
 
-        // 3. Glass Action Panel (Bottom)
+
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -97,7 +95,7 @@ fun MapsScreen(onBack: () -> Unit = {}) { // Added onBack callback
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Button 1: Police
+
                 ActionButton(
                     text = "Police",
                     icon = Icons.Default.LocalPolice,
@@ -106,7 +104,7 @@ fun MapsScreen(onBack: () -> Unit = {}) { // Added onBack callback
                         val gmmIntentUri = Uri.parse("geo:0,0?q=police+station+near+me")
                         val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
                         mapIntent.setPackage("com.google.android.apps.maps")
-                        // Fallback if maps app not installed
+
                         if (mapIntent.resolveActivity(context.packageManager) != null) {
                             context.startActivity(mapIntent)
                         } else {
@@ -119,7 +117,7 @@ fun MapsScreen(onBack: () -> Unit = {}) { // Added onBack callback
                 ActionButton(
                     text = "Courts",
                     icon = Icons.Default.AccountBalance,
-                    color = AccentGold, // Gold
+                    color = AccentGold,
                     onClick = {
                         val gmmIntentUri = Uri.parse("geo:0,0?q=district+court+near+me")
                         val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)

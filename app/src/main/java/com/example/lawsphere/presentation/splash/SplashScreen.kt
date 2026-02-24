@@ -44,7 +44,7 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
             targetValue = 1f,
             animationSpec = tween(durationMillis = 800)
         )
-        delay(1000) // Hold for 1 second
+        delay(1000)
         onSplashFinished()
     }
 
@@ -59,7 +59,7 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            // Legal Icon
+
             Box(
                 modifier = Modifier
                     .scale(scale.value)
@@ -68,7 +68,7 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.Scale, // Represents Justice
+                    imageVector = Icons.Default.Scale,
                     contentDescription = "Logo",
                     tint = AccentGold,
                     modifier = Modifier.size(80.dp)
@@ -77,7 +77,6 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // App Name
             Text(
                 text = "LawSphere",
                 fontSize = 32.sp,

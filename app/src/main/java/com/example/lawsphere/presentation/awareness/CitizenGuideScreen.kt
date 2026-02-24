@@ -115,7 +115,7 @@ fun CitizenGuideScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ✅ Button stays here (your intended position)
+
         Button(
             onClick = onOpenMap,
             modifier = Modifier.fillMaxWidth(),

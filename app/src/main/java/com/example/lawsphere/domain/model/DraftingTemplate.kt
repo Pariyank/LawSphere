@@ -8,7 +8,7 @@ sealed class DraftingTemplate(val title: String, val id: String) {
 
 data class DraftInput(
     val senderName: String = "",
-    val recipientName: String = "", // Or Police Station
+    val recipientName: String = "",
     val date: String = "",
     val subject: String = "",
     val contentDetails: String = ""

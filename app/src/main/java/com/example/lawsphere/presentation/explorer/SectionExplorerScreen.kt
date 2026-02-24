@@ -33,7 +33,7 @@ import com.example.lawsphere.presentation.chat.GlassSurface
 @Composable
 fun SectionExplorerScreen(
     onOpenRoadmap: () -> Unit,
-    onOpenCompare: () -> Unit // ✅ ADDED THIS
+    onOpenCompare: () -> Unit
 ) {
     val context = LocalContext.current
     val allSections = remember { JsonParser.loadBnsSections(context) }
@@ -74,7 +74,7 @@ fun SectionExplorerScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 🔹 Buttons Row (YOUR POSITION – not top)
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)

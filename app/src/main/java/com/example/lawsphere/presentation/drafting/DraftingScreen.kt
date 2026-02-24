@@ -39,7 +39,6 @@ import java.util.Locale
 fun DraftingScreen() {
     var selectedTemplate by remember { mutableStateOf<DraftingTemplate?>(null) }
 
-    // Navigation within the tab
     if (selectedTemplate == null) {
         TemplateSelectionList(onSelect = { selectedTemplate = it })
     } else {
@@ -123,7 +122,6 @@ fun DraftingForm(template: DraftingTemplate, onBack: () -> Unit) {
     val context = LocalContext.current
     val currentDate = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault()).format(Date())
 
-    // Form State
     var senderName by remember { mutableStateOf("") }
     var recipientName by remember { mutableStateOf("") } // or Station Name
     var details by remember { mutableStateOf("") }
@@ -134,7 +132,7 @@ fun DraftingForm(template: DraftingTemplate, onBack: () -> Unit) {
             .background(GlassDark)
             .padding(16.dp)
     ) {
-        // Header
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
@@ -205,9 +203,6 @@ fun CustomTextField(value: String, isMultiLine: Boolean = false, onValueChange: 
     )
 }
 
-// --------------------------------------------------
-// LOGIC: Convert Form Data to HTML for PDF
-// --------------------------------------------------
 fun generateLegalHtml(
     template: DraftingTemplate,
     sender: String,

@@ -37,49 +37,49 @@ data class CareerStep(
 )
 
 @Composable
-fun RoadmapScreen(onBack: () -> Unit = {}) { // Added onBack callback
+fun RoadmapScreen(onBack: () -> Unit = {}) {
     val steps = listOf(
         CareerStep(
             "1. CLAT / Entrance Exam",
             "After 12th Grade",
             "Clear Common Law Admission Test (CLAT) or AILET to get into top NLUs.",
             Icons.Default.School,
-            Color(0xFF64B5F6) // Blue
+            Color(0xFF64B5F6)
         ),
         CareerStep(
             "2. LLB Degree",
             "5 Years (Integrated) or 3 Years",
             "Complete your Bachelor of Legislative Law. Focus on Constitutional Law & IPC.",
             Icons.Default.School,
-            Color(0xFF81C784) // Green
+            Color(0xFF81C784)
         ),
         CareerStep(
             "3. AIBE Exam",
             "Post Graduation",
             "Pass the All India Bar Examination to get your 'Certificate of Practice'.",
             Icons.Default.Star,
-            Color(0xFFFFD54F) // Yellow
+            Color(0xFFFFD54F)
         ),
         CareerStep(
             "4. Junior Advocate",
             "2-5 Years Experience",
             "Join a District Court or High Court under a senior lawyer. Learn drafting & arguments.",
             Icons.Default.Work,
-            Color(0xFFFF8A65) // Orange
+            Color(0xFFFF8A65)
         ),
         CareerStep(
             "5. Judiciary (PCS-J)",
             "Optional Path",
             "Crack the State Judicial Services exam to become a Civil Judge/Magistrate.",
-            Icons.Default.AccountBalance, // Note: Use available icon
-            Color(0xFFBA68C8) // Purple
+            Icons.Default.AccountBalance,
+            Color(0xFFBA68C8)
         ),
         CareerStep(
             "6. Senior Advocate",
             "10+ Years Experience",
             "Designated by the High Court or Supreme Court based on merit and knowledge.",
             Icons.Default.Star,
-            AccentGold // Gold
+            AccentGold
         )
     )
 
@@ -89,7 +89,6 @@ fun RoadmapScreen(onBack: () -> Unit = {}) { // Added onBack callback
             .background(GlassDark)
             .padding(16.dp)
     ) {
-        // Header
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
@@ -112,7 +111,6 @@ fun RoadmapScreen(onBack: () -> Unit = {}) { // Added onBack callback
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Timeline List
         LazyColumn(
             contentPadding = PaddingValues(bottom = 20.dp)
         ) {
@@ -126,12 +124,11 @@ fun RoadmapScreen(onBack: () -> Unit = {}) { // Added onBack callback
 @Composable
 fun TimelineItem(step: CareerStep) {
     Row(modifier = Modifier.height(IntrinsicSize.Min)) {
-        // 1. The Timeline Line & Dot
+
         Column(
             modifier = Modifier.width(48.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // The Dot
             Box(
                 modifier = Modifier
                     .size(24.dp)
@@ -147,7 +144,6 @@ fun TimelineItem(step: CareerStep) {
                 )
             }
 
-            // The Line
             Canvas(modifier = Modifier
                 .width(2.dp)
                 .fillMaxHeight()
@@ -163,7 +159,6 @@ fun TimelineItem(step: CareerStep) {
             }
         }
 
-        // 2. The Content Card
         Card(
             colors = CardDefaults.cardColors(containerColor = GlassSurface),
             shape = RoundedCornerShape(16.dp),

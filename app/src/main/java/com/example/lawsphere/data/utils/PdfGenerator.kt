@@ -8,15 +8,9 @@ import android.webkit.WebViewClient
 
 object PdfGenerator {
 
-    /**
-     * Generates a PDF by rendering HTML content into a WebView
-     * and using the Android PrintManager to "Print to PDF".
-     */
     fun generatePdf(context: Context, documentTitle: String, htmlContent: String) {
-        // Create a WebView to render the HTML
         val webView = WebView(context)
 
-        // Define the HTML structure with basic styling for legal docs
         val styledHtml = """
             <html>
             <head>
@@ -42,7 +36,6 @@ object PdfGenerator {
             }
         }
 
-        // Load the content
         webView.loadDataWithBaseURL(null, styledHtml, "text/HTML", "UTF-8", null)
     }
 

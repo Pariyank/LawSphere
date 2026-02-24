@@ -29,7 +29,6 @@ class ChatViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-    // ================= ASK =================
     fun sendMessage(query: String) {
         if (query.isBlank()) return
 
@@ -38,7 +37,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // 🟢 Determine Language
+
                 val lang = if (AppPreferences.isHindiMode) "hindi" else "english"
 
                 val response = withContext(Dispatchers.IO) {
@@ -66,7 +65,6 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    // ================= COMPARE =================
     fun compareSections(section1: String, section2: String) {
         if (section1.isBlank() || section2.isBlank()) return
         _comparisonResult.value = null

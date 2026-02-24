@@ -2,7 +2,7 @@ package com.example.lawsphere.data.model
 
 data class ChatRequest(
     val query: String,
-    val language: String = "english" // 🟢 Added
+    val language: String = "english"
 )
 
 data class CompareRequest(

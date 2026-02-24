@@ -63,7 +63,7 @@ fun CaseDashboardScreen(viewModel: CaseDashboardViewModel = hiltViewModel()) {
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(bottom = 80.dp) // Space for FAB
+                    contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
                     items(cases) { caseFile ->
                         CaseCard(caseFile, onDelete = { viewModel.deleteCase(caseFile.id) })

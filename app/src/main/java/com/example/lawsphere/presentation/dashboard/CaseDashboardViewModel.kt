@@ -46,14 +46,14 @@ class CaseDashboardViewModel @Inject constructor(
                 notes = notes
             )
             repository.addCase(newCase)
-            loadCases() // Refresh list
+            loadCases()
         }
     }
 
     fun deleteCase(caseId: String) {
         viewModelScope.launch {
             repository.deleteCase(caseId)
-            loadCases() // Refresh list
+            loadCases()
         }
     }
 }

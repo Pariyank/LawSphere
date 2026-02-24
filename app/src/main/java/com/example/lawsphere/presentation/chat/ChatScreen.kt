@@ -31,7 +31,6 @@ import com.example.lawsphere.domain.model.ChatMessage
 import com.example.lawsphere.presentation.scanner.CameraScreen // Ensure this file exists
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
-// ================= THEME COLORS =================
 val GlassDark = Color(0xFF121212)
 val GlassSurface = Color(0xFF1E1E1E).copy(alpha = 0.7f)
 val AccentGold = Color(0xFFD4AF37)
@@ -39,38 +38,34 @@ val AccentGold = Color(0xFFD4AF37)
 @Composable
 fun ChatScreen(
     viewModel: ChatViewModel = hiltViewModel(),
-    onLogout: () -> Unit = {} // kept for compatibility, though moved to Profile
+    onLogout: () -> Unit = {}
 ) {
     val messages by viewModel.messages.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    // State for Text Input
     var inputText by remember { mutableStateOf("") }
 
-    // State for Camera/OCR (Novelty Feature)
     var showCamera by remember { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
 
-    // Auto-scroll to bottom when new message arrives
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.size - 1)
         }
     }
 
-    // 🟢 LOGIC: Toggle between Camera and Chat
     if (showCamera) {
-        // Show the Full Screen Camera for OCR
+
         CameraScreen(
             onTextRecognized = { scannedText ->
                 inputText = "Analyze this document context:\n$scannedText"
-                showCamera = false // Close camera after scanning
+                showCamera = false
             },
             onClose = { showCamera = false }
         )
     } else {
-        // Show Normal Chat UI
+
         Scaffold(
             containerColor = GlassDark,
             topBar = {
@@ -84,7 +79,7 @@ fun ChatScreen(
                         viewModel.sendMessage(inputText)
                         inputText = ""
                     },
-                    onCameraClick = { showCamera = true }, // Open Camera
+                    onCameraClick = { showCamera = true },
                     enabled = !isLoading
                 )
             }
@@ -151,7 +146,7 @@ fun ChatBubble(message: ChatMessage) {
                     style = MaterialTheme.typography.bodyMedium
                 )
             } else {
-                // Markdown Rendering for AI
+
                 MarkdownText(
                     markdown = message.text,
                     color = textColor,
@@ -160,7 +155,6 @@ fun ChatBubble(message: ChatMessage) {
             }
         }
 
-        // Show Citations if available
         if (!isUser && message.sources.isNotEmpty()) {
             Column(modifier = Modifier.padding(top = 4.dp, start = 8.dp)) {
                 message.sources.forEach { source ->
@@ -184,7 +178,7 @@ fun ChatInput(
     onCameraClick: () -> Unit,
     enabled: Boolean
 ) {
-    // 🟢 Voice Recognition Launcher
+
     val speechLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -205,7 +199,7 @@ fun ChatInput(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // 🟢 Scanner Button (Novelty)
+
         IconButton(
             onClick = onCameraClick,
             modifier = Modifier.size(40.dp),
@@ -216,7 +210,6 @@ fun ChatInput(
 
         Spacer(modifier = Modifier.width(4.dp))
 
-        // Input Field
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
@@ -238,9 +231,8 @@ fun ChatInput(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // 🟢 Mic OR Send Button
         if (value.isBlank()) {
-            // Show Mic if text is empty
+
             IconButton(
                 onClick = {
                     val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
@@ -250,7 +242,7 @@ fun ChatInput(
                     try {
                         speechLauncher.launch(intent)
                     } catch (e: Exception) {
-                        // Handle emulator or devices without speech
+
                     }
                 },
                 colors = IconButtonDefaults.iconButtonColors(

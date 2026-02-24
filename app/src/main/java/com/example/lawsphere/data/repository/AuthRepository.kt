@@ -9,7 +9,6 @@ class AuthRepository @Inject constructor() {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
-    // Login Function
     suspend fun login(email: String, pass: String): Result<String> {
         return try {
             auth.signInWithEmailAndPassword(email, pass).await()
@@ -19,18 +18,16 @@ class AuthRepository @Inject constructor() {
         }
     }
 
-    // Signup Function with Role
     suspend fun signup(email: String, pass: String, name: String, role: String): Result<String> {
         return try {
             val result = auth.createUserWithEmailAndPassword(email, pass).await()
             val uid = result.user?.uid ?: throw Exception("User creation failed")
 
-            // Save User Data to Firestore
             val userMap = hashMapOf(
                 "uid" to uid,
                 "name" to name,
                 "email" to email,
-                "role" to role // "lawyer" or "citizen"
+                "role" to role
             )
             db.collection("users").document(uid).set(userMap).await()
 

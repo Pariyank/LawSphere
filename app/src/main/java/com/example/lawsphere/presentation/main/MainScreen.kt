@@ -99,7 +99,6 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
 
         Box(modifier = Modifier.padding(padding)) {
 
-            // 🟢 Navigation Priority Order
             when {
                 showCompare -> {
                     CompareScreen(
@@ -128,7 +127,7 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
                         BottomNavItem.Explorer ->
                             SectionExplorerScreen(
                                 onOpenRoadmap = { showRoadmap = true },
-                                onOpenCompare = { showCompare = true } // ✅ New callback
+                                onOpenCompare = { showCompare = true }
                             )
 
                         BottomNavItem.Drafting ->

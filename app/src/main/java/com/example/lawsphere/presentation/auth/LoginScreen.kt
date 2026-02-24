@@ -31,7 +31,7 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
-    var selectedRole by remember { mutableStateOf("citizen") } // "citizen" or "lawyer"
+    var selectedRole by remember { mutableStateOf("citizen") }
 
     LaunchedEffect(authState) {
         when (authState) {
@@ -76,7 +76,6 @@ fun LoginScreen(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Role Selector
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly

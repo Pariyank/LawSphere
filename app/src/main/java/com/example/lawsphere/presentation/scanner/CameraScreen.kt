@@ -41,7 +41,6 @@ fun CameraScreen(
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
 
-        // 1. Camera Preview
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = { ctx ->
@@ -70,7 +69,6 @@ fun CameraScreen(
             }
         )
 
-        // 2. Overlay Controls
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -91,7 +89,6 @@ fun CameraScreen(
             Text("Scan Legal Document", color = Color.White)
         }
 
-        // Close Button
         IconButton(
             onClick = onClose,
             modifier = Modifier.padding(32.dp).align(Alignment.TopEnd)

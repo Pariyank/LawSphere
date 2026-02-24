@@ -8,5 +8,5 @@ data class BnsSection(
     val cognizable: String,
     val bailable: String,
     val punishment: String,
-    val cases: List<String> = emptyList() // 🟢 Added this
+    val cases: List<String> = emptyList()
 )

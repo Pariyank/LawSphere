@@ -6,6 +6,6 @@ data class CaseFile(
     val caseNumber: String = "",
     val courtName: String = "",
     val nextHearingDate: String = "",
-    val status: String = "Active", // Active, Closed, Pending
+    val status: String = "Active",
     val notes: String = ""
 )

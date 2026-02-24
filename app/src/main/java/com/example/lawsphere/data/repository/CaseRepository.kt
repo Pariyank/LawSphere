@@ -11,10 +11,10 @@ class CaseRepository @Inject constructor() {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
-    // Get current user's ID
+
     private val userId = auth.currentUser?.uid
 
-    // 1. Add New Case
+
     suspend fun addCase(caseFile: CaseFile): Result<Boolean> {
         return try {
             if (userId == null) throw Exception("User not logged in")
@@ -22,7 +22,7 @@ class CaseRepository @Inject constructor() {
             val newDocRef = db.collection("users").document(userId)
                 .collection("cases").document()
 
-            // Save with ID
+
             val caseWithId = caseFile.copy(id = newDocRef.id)
             newDocRef.set(caseWithId).await()
 
@@ -32,7 +32,6 @@ class CaseRepository @Inject constructor() {
         }
     }
 
-    // 2. Get All Cases (Real-time not strictly needed, fetch once is fine for now)
     suspend fun getCases(): Result<List<CaseFile>> {
         return try {
             if (userId == null) throw Exception("User not logged in")
@@ -49,7 +48,6 @@ class CaseRepository @Inject constructor() {
         }
     }
 
-    // 3. Delete Case
     suspend fun deleteCase(caseId: String): Result<Boolean> {
         return try {
             if (userId == null) throw Exception("User not logged in")
