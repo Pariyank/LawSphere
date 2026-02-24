@@ -70,9 +70,16 @@ fun LoginScreen(
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
-                        label = { Text("Full Name") },
+                        label = { Text("Full Name", color = Color.Gray) },
                         modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedBorderColor = AccentGold,
+                            unfocusedBorderColor = Color.Gray,
+                            cursorColor = AccentGold
+                        )
                     )
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -91,7 +98,14 @@ fun LoginScreen(
                     onValueChange = { email = it },
                     label = { Text("Email", color = Color.Gray) },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedBorderColor = AccentGold,
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = AccentGold
+                    )
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -101,7 +115,14 @@ fun LoginScreen(
                     label = { Text("Password", color = Color.Gray) },
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedBorderColor = AccentGold,
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = AccentGold
+                    )
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -119,7 +140,7 @@ fun LoginScreen(
                     if (authState is AuthState.Loading) {
                         CircularProgressIndicator(color = Color.Black, modifier = Modifier.size(24.dp))
                     } else {
-                        Text(if (isLoginMode) "Login" else "Sign Up", color = Color.White)
+                        Text(if (isLoginMode) "Login" else "Sign Up", color = Color.Black)
                     }
                 }
 
@@ -145,7 +166,7 @@ fun RoleChip(label: String, isSelected: Boolean, onClick: () -> Unit) {
         Text(
             text = label,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            color = if (isSelected) Color.White else Color.White
+            color = if (isSelected) Color.Black else Color.White
         )
     }
 }

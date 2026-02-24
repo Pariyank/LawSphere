@@ -44,9 +44,7 @@ fun ChatScreen(
     val isLoading by viewModel.isLoading.collectAsState()
 
     var inputText by remember { mutableStateOf("") }
-
     var showCamera by remember { mutableStateOf(false) }
-
     val listState = rememberLazyListState()
 
     LaunchedEffect(messages.size) {
@@ -56,7 +54,6 @@ fun ChatScreen(
     }
 
     if (showCamera) {
-
         CameraScreen(
             onTextRecognized = { scannedText ->
                 inputText = "Analyze this document context:\n$scannedText"
@@ -65,12 +62,9 @@ fun ChatScreen(
             onClose = { showCamera = false }
         )
     } else {
-
         Scaffold(
             containerColor = GlassDark,
-            topBar = {
-                GlassTopBar()
-            },
+            topBar = { GlassTopBar() },
             bottomBar = {
                 ChatInput(
                     value = inputText,
@@ -146,7 +140,6 @@ fun ChatBubble(message: ChatMessage) {
                     style = MaterialTheme.typography.bodyMedium
                 )
             } else {
-
                 MarkdownText(
                     markdown = message.text,
                     color = textColor,
@@ -155,18 +148,7 @@ fun ChatBubble(message: ChatMessage) {
             }
         }
 
-        if (!isUser && message.sources.isNotEmpty()) {
-            Column(modifier = Modifier.padding(top = 4.dp, start = 8.dp)) {
-                message.sources.forEach { source ->
-                    Text(
-                        text = source,
-                        color = Color.Gray,
-                        fontSize = 11.sp,
-                        modifier = Modifier.padding(bottom = 2.dp)
-                    )
-                }
-            }
-        }
+        // 🟢 REMOVED THE SOURCE LIST HERE for cleaner UI
     }
 }
 
@@ -178,7 +160,6 @@ fun ChatInput(
     onCameraClick: () -> Unit,
     enabled: Boolean
 ) {
-
     val speechLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -199,7 +180,6 @@ fun ChatInput(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         IconButton(
             onClick = onCameraClick,
             modifier = Modifier.size(40.dp),
@@ -232,7 +212,6 @@ fun ChatInput(
         Spacer(modifier = Modifier.width(8.dp))
 
         if (value.isBlank()) {
-
             IconButton(
                 onClick = {
                     val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
@@ -241,9 +220,7 @@ fun ChatInput(
                     }
                     try {
                         speechLauncher.launch(intent)
-                    } catch (e: Exception) {
-
-                    }
+                    } catch (e: Exception) {}
                 },
                 colors = IconButtonDefaults.iconButtonColors(
                     containerColor = GlassSurface,
@@ -253,7 +230,6 @@ fun ChatInput(
                 Icon(Icons.Default.Mic, contentDescription = "Speak")
             }
         } else {
-            // Show Send if text exists
             IconButton(
                 onClick = onSend,
                 enabled = enabled,
