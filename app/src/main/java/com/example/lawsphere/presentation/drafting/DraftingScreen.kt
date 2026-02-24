@@ -20,13 +20,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.lawsphere.data.utils.PdfGenerator
-import com.example.lawsphere.domain.model.DraftInput
 import com.example.lawsphere.domain.model.DraftingTemplate
 import com.example.lawsphere.presentation.chat.AccentGold
 import com.example.lawsphere.presentation.chat.GlassDark
@@ -97,6 +95,11 @@ fun TemplateCard(template: DraftingTemplate, onClick: (DraftingTemplate) -> Unit
         else -> Icons.Default.Assignment
     }
 
+    val displayTitle = when(template) {
+        DraftingTemplate.FIR -> "Police Complaint / FIR"
+        else -> template.title
+    }
+
     Card(
         colors = CardDefaults.cardColors(containerColor = GlassSurface),
         shape = RoundedCornerShape(16.dp),
@@ -112,7 +115,13 @@ fun TemplateCard(template: DraftingTemplate, onClick: (DraftingTemplate) -> Unit
         ) {
             Icon(icon, contentDescription = null, tint = AccentGold, modifier = Modifier.size(40.dp))
             Spacer(modifier = Modifier.height(12.dp))
-            Text(template.title, color = Color.White, fontWeight = FontWeight.Bold)
+            Text(
+                text = displayTitle,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 8.dp),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
         }
     }
 }
@@ -123,8 +132,14 @@ fun DraftingForm(template: DraftingTemplate, onBack: () -> Unit) {
     val currentDate = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault()).format(Date())
 
     var senderName by remember { mutableStateOf("") }
-    var recipientName by remember { mutableStateOf("") } // or Station Name
+    var recipientName by remember { mutableStateOf("") }
     var details by remember { mutableStateOf("") }
+
+
+    val titleText = when(template) {
+        DraftingTemplate.FIR -> "Police Complaint"
+        else -> template.title
+    }
 
     Column(
         modifier = Modifier
@@ -137,7 +152,7 @@ fun DraftingForm(template: DraftingTemplate, onBack: () -> Unit) {
             IconButton(onClick = onBack) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
             }
-            Text(template.title, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(titleText, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
 
         Divider(color = Color.Gray.copy(0.3f))
@@ -153,13 +168,13 @@ fun DraftingForm(template: DraftingTemplate, onBack: () -> Unit) {
             }
 
             item {
-                val label = if (template == DraftingTemplate.FIR) "Police Station Name" else "Recipient / Court Name"
+                val label = if (template == DraftingTemplate.FIR) "Police Station Name & Address" else "Recipient / Court Name"
                 InputLabel(label)
                 CustomTextField(recipientName) { recipientName = it }
             }
 
             item {
-                val label = if (template == DraftingTemplate.FIR) "Incident Details" else "Case Details / Notice Content"
+                val label = if (template == DraftingTemplate.FIR) "Incident Details (Date, Time, Place, What happened)" else "Case Details / Notice Content"
                 InputLabel(label)
                 CustomTextField(details, isMultiLine = true) { details = it }
             }
@@ -168,7 +183,7 @@ fun DraftingForm(template: DraftingTemplate, onBack: () -> Unit) {
         Button(
             onClick = {
                 val html = generateLegalHtml(template, senderName, recipientName, currentDate, details)
-                PdfGenerator.generatePdf(context, "${template.title}_$currentDate", html)
+                PdfGenerator.generatePdf(context, "${template.id}_$currentDate", html)
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = AccentGold),
@@ -197,7 +212,9 @@ fun CustomTextField(value: String, isMultiLine: Boolean = false, onValueChange: 
             unfocusedBorderColor = Color.Gray,
             focusedTextColor = Color.White,
             unfocusedTextColor = Color.White,
-            cursorColor = AccentGold
+            cursorColor = AccentGold,
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent
         ),
         maxLines = if (isMultiLine) 10 else 1
     )
@@ -212,19 +229,27 @@ fun generateLegalHtml(
 ): String {
     return when (template) {
         DraftingTemplate.FIR -> """
-            <h1>First Information Report (FIR)</h1>
+            <h1>Application for Registration of FIR</h1>
             <p><b>Date:</b> $date</p>
             <p><b>To, The Station House Officer (SHO),</b><br>$recipient</p>
-            <h2>Subject: Complaint regarding incident.</h2>
+            
+            <h2>Subject: Formal complaint for registration of First Information Report (FIR).</h2>
+            
             <div class='content'>
                 <p>Respected Sir/Madam,</p>
-                <p>I, <b>$sender</b>, wish to report an incident that took place as described below:</p>
+                <p>I, <b>$sender</b>, wish to report a cognizable offense committed against me/in my presence. I request you to register an FIR under the relevant sections of the Bharatiya Nyaya Sanhita (BNS) based on the following facts:</p>
+                
+                <h3>Incident Details:</h3>
                 <p>$details</p>
-                <p>I request you to kindly register an FIR and take necessary legal action against the culprits.</p>
+                
+                <p><b>Prayer:</b></p>
+                <p>In light of the facts mentioned above, it is requested that an FIR be registered immediately, and a copy of the same be provided to me free of cost as per my legal right.</p>
             </div>
+            
             <div class='signature'>
                 <p>Sincerely,</p>
-                <p>$sender</p>
+                <p><b>$sender</b></p>
+                <p>(Complainant)</p>
             </div>
         """
         DraftingTemplate.Bail -> """
