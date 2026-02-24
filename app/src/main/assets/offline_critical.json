@@ -1,0 +1,261 @@
+[
+  {
+    "category": "General",
+    "section": "BNS 103(1)",
+    "title": "Punishment for Murder",
+    "description": "Whoever commits murder shall be punished with death or imprisonment for life, and shall also be liable to fine.",
+    "punishment": "Death or Imprisonment for Life + Fine"
+  },
+  {
+    "category": "General",
+    "section": "BNS 103(2)",
+    "title": "Mob Lynching / Murder by Group",
+    "description": "When a group of five or more persons acting in concert commits murder on the ground of race, caste or community, sex, place of birth, language, personal belief or any other similar ground.",
+    "punishment": "Death or Imprisonment for Life + Fine"
+  },
+  {
+    "category": "General",
+    "section": "BNS 303(2)",
+    "title": "Punishment for Theft",
+    "description": "Whoever commits theft shall be punished with imprisonment of either description for a term which may extend to three years, or with fine, or with both.",
+    "punishment": "Imprisonment up to 3 years or Fine or Both"
+  },
+  {
+    "category": "General",
+    "section": "BNS 304(1)",
+    "title": "Snatching",
+    "description": "Theft is snatching if, in order to commit theft, the offender suddenly or quickly or forcibly seizes or secures or grabs or takes away from any person or from his possession any movable property.",
+    "punishment": "Imprisonment up to 3 years + Fine"
+  },
+  {
+    "category": "Women",
+    "section": "BNS 69",
+    "title": "Sexual Intercourse by Deceitful Means",
+    "description": "Whoever, by deceitful means or by making promise to marry to a woman without any intention of fulfilling the same, has sexual intercourse with her, such sexual intercourse not amounting to the offence of rape.",
+    "punishment": "Imprisonment up to 10 years + Fine"
+  },
+  {
+    "category": "Women",
+    "section": "BNS 64(1)",
+    "title": "Punishment for Rape",
+    "description": "Whoever commits rape, shall be punished with rigorous imprisonment of either description for a term which shall not be less than ten years, but which may extend to imprisonment for life.",
+    "punishment": "Rigorous Imprisonment (Min 10 years to Life) + Fine"
+  },
+  {
+    "category": "Women",
+    "section": "BNS 74",
+    "title": "Assault to Outrage Modesty",
+    "description": "Whoever assaults or uses criminal force to any woman, intending to outrage or knowing it to be likely that he will thereby outrage her modesty.",
+    "punishment": "Imprisonment (Min 1 year to 5 years) + Fine"
+  },
+  {
+    "category": "Women",
+    "section": "BNS 75",
+    "title": "Sexual Harassment",
+    "description": "Physical contact and advances involving unwelcome and explicit sexual overtures; or a demand or request for sexual favours; or showing pornography against the will of a woman; or making sexually coloured remarks.",
+    "punishment": "Imprisonment up to 3 years or Fine or Both"
+  },
+  {
+    "category": "Women",
+    "section": "BNS 77",
+    "title": "Voyeurism",
+    "description": "Whoever watches, or captures the image of a woman engaging in a private act in circumstances where she would usually have the expectation of not being observed.",
+    "punishment": "First Conviction: 1 to 3 years + Fine"
+  },
+  {
+    "category": "Women",
+    "section": "BNS 78",
+    "title": "Stalking",
+    "description": "Any man who follows a woman and contacts, or attempts to contact such woman to foster personal interaction repeatedly despite a clear indication of disinterest, or monitors the use by a woman of the internet/email.",
+    "punishment": "First Conviction: Up to 3 years + Fine"
+  },
+  {
+    "category": "Women",
+    "section": "BNS 85",
+    "title": "Cruelty by Husband or Relatives",
+    "description": "Whoever, being the husband or the relative of the husband of a woman, subjects such woman to cruelty (mental or physical harm).",
+    "punishment": "Imprisonment up to 3 years + Fine"
+  },
+  {
+    "category": "Women",
+    "section": "BNS 80",
+    "title": "Dowry Death",
+    "description": "Where the death of a woman is caused by any burns or bodily injury... within seven years of her marriage and it is shown that soon before her death she was subjected to cruelty or harassment... for any demand for dowry.",
+    "punishment": "Imprisonment not less than 7 years (up to Life)"
+  },
+  {
+    "category": "Traffic",
+    "section": "BNS 281",
+    "title": "Rash Driving",
+    "description": "Whoever drives any vehicle, or rides, on any public way in a manner so rash or negligent as to endanger human life, or to be likely to cause hurt or injury to any other person.",
+    "punishment": "Imprisonment up to 6 months or Fine up to ₹1,000 or Both"
+  },
+  {
+    "category": "Traffic",
+    "section": "BNS 106(1)",
+    "title": "Causing Death by Negligence",
+    "description": "Whoever causes death of any person by doing any rash or negligent act not amounting to culpable homicide.",
+    "punishment": "Imprisonment up to 5 years + Fine"
+  },
+  {
+    "category": "Traffic",
+    "section": "BNS 106(2)",
+    "title": "Hit and Run",
+    "description": "Whoever causes death of any person by rash and negligent driving of vehicle... and escapes without reporting it to a police officer or a Magistrate soon after the incident.",
+    "punishment": "Imprisonment up to 10 years + Fine"
+  },
+  {
+    "category": "General",
+    "section": "BNS 38",
+    "title": "Right of Private Defence (Body)",
+    "description": "The right of private defence of the body extends to the voluntary causing of death if the offence involves: assault causing fear of death/grievous hurt, rape, unnatural lust, kidnapping, or acid attack.",
+    "punishment": "Right of Defence (Not an Offence)"
+  },
+  {
+    "category": "General",
+    "section": "BNS 43",
+    "title": "Right of Private Defence (Property)",
+    "description": "The right of private defence of property extends to causing death if the offence is robbery, house-breaking after sunset/before sunrise, or mischief by fire to a dwelling/vessel.",
+    "punishment": "Right of Defence (Not an Offence)"
+  },
+  {
+    "category": "National Security",
+    "section": "BNS 111",
+    "title": "Organised Crime",
+    "description": "Any continuing unlawful activity including kidnapping, robbery, vehicle theft, contract killing, economic offence, cyber-crimes... by a member of an organised crime syndicate.",
+    "punishment": "Death or Imprisonment for Life (if death results) / Min 5 years (others)"
+  },
+  {
+    "category": "National Security",
+    "section": "BNS 113",
+    "title": "Terrorist Act",
+    "description": "Whoever does any act with the intent to threaten the unity, integrity, sovereignty, security, or economic security of India... using bombs, dynamite, firearms, or poisonous gases.",
+    "punishment": "Death or Imprisonment for Life (if death results) / Min 5 years (others)"
+  },
+  {
+    "category": "National Security",
+    "section": "BNS 152",
+    "title": "Acts Endangering Sovereignty",
+    "description": "Whoever excites secession or armed rebellion or subversive activities, or encourages feelings of separatist activities or endangers sovereignty or unity and integrity of India.",
+    "punishment": "Imprisonment for Life or up to 7 years + Fine"
+  },
+  {
+    "category": "General",
+    "section": "BNS 109",
+    "title": "Attempt to Murder",
+    "description": "Whoever does any act with such intention or knowledge... that if he by that act caused death, he would be guilty of murder.",
+    "punishment": "Imprisonment up to 10 years + Fine (Life Imprisonment if hurt caused)"
+  },
+  {
+    "category": "Women",
+    "section": "BNS 79",
+    "title": "Insulting Modesty of a Woman",
+    "description": "Whoever, intending to insult the modesty of any woman, utters any words, makes any sound or gesture, or exhibits any object... or intrudes upon the privacy of such woman.",
+    "punishment": "Simple Imprisonment up to 3 years + Fine"
+  },
+  {
+    "category": "Women",
+    "section": "BNS 124(2)",
+    "title": "Acid Attack",
+    "description": "Whoever throws or attempts to throw acid on any person... with the intention of causing permanent or partial damage or deformity or burns.",
+    "punishment": "Imprisonment not less than 5 years (up to 7 years) + Fine"
+  },
+  {
+    "category": "Financial",
+    "section": "BNS 316(2)",
+    "title": "Criminal Breach of Trust",
+    "description": "Whoever, being entrusted with property, dishonestly misappropriates or converts to his own use that property.",
+    "punishment": "Imprisonment up to 5 years + Fine"
+  },
+  {
+    "category": "Financial",
+    "section": "BNS 318(4)",
+    "title": "Cheating",
+    "description": "Whoever cheats and thereby dishonestly induces the person deceived to deliver any property... or to make, alter or destroy the whole or any part of a valuable security.",
+    "punishment": "Imprisonment up to 7 years + Fine"
+  },
+  {
+    "category": "Financial",
+    "section": "BNS 319(2)",
+    "title": "Cheating by Personation",
+    "description": "Whoever cheats by pretending to be some other person, or by knowingly substituting one person for another.",
+    "punishment": "Imprisonment up to 5 years + Fine"
+  },
+  {
+    "category": "General",
+    "section": "BNS 308",
+    "title": "Extortion",
+    "description": "Whoever intentionally puts any person in fear of any injury to that person... and thereby dishonestly induces the person so put in fear to deliver property.",
+    "punishment": "Imprisonment up to 7 years + Fine"
+  },
+  {
+    "category": "General",
+    "section": "BNS 309",
+    "title": "Robbery",
+    "description": "Theft is robbery if... the offender voluntarily causes or attempts to cause to any person death or hurt or wrongful restraint.",
+    "punishment": "Rigorous Imprisonment up to 10 years + Fine (14 years if on highway at night)"
+  },
+  {
+    "category": "General",
+    "section": "BNS 310(2)",
+    "title": "Dacoity",
+    "description": "When five or more persons conjointly commit or attempt to commit a robbery.",
+    "punishment": "Imprisonment for Life or Rigorous Imprisonment up to 10 years + Fine"
+  },
+  {
+    "category": "General",
+    "section": "BNS 329(3)",
+    "title": "Criminal Trespass",
+    "description": "Whoever enters into or upon property in the possession of another with intent to commit an offence or to intimidate, insult or annoy any person.",
+    "punishment": "Imprisonment up to 3 months + Fine ₹5,000"
+  },
+  {
+    "category": "General",
+    "section": "BNS 331(2)",
+    "title": "Lurking House-Trespass (Night)",
+    "description": "Whoever commits lurking house-trespass or house-breaking after sunset and before sunrise.",
+    "punishment": "Imprisonment up to 3 years + Fine"
+  },
+  {
+    "category": "Public Order",
+    "section": "BNS 189(2)",
+    "title": "Unlawful Assembly",
+    "description": "Whoever is a member of an unlawful assembly (five or more persons with common object to overawe govt, resist law, etc.).",
+    "punishment": "Imprisonment up to 6 months + Fine"
+  },
+  {
+    "category": "Public Order",
+    "section": "BNS 191(2)",
+    "title": "Rioting",
+    "description": "Whoever is guilty of rioting (force/violence used by unlawful assembly).",
+    "punishment": "Imprisonment up to 2 years + Fine"
+  },
+  {
+    "category": "Public Order",
+    "section": "BNS 194",
+    "title": "Affray",
+    "description": "When two or more persons, by fighting in a public place, disturb the public peace.",
+    "punishment": "Imprisonment up to 1 month + Fine ₹1,000"
+  },
+  {
+    "category": "Public Order",
+    "section": "BNS 356",
+    "title": "Defamation",
+    "description": "Whoever, by words, signs or visible representations, makes or publishes any imputation concerning any person intending to harm the reputation.",
+    "punishment": "Simple Imprisonment up to 2 years or Community Service + Fine"
+  },
+  {
+    "category": "Public Order",
+    "section": "BNS 351(2)",
+    "title": "Criminal Intimidation",
+    "description": "Whoever threatens another with any injury to his person, reputation or property... with intent to cause alarm.",
+    "punishment": "Imprisonment up to 2 years + Fine"
+  },
+  {
+    "category": "General",
+    "section": "BNS 108",
+    "title": "Abetment of Suicide",
+    "description": "If any person commits suicide, whoever abets the commission of such suicide.",
+    "punishment": "Imprisonment up to 10 years + Fine"
+  }
+]
