@@ -18,12 +18,24 @@ class AuthRepository @Inject constructor(
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
-
-    suspend fun login(email: String, pass: String): Result<String> {
+    suspend fun login(email: String, pass: String, selectedRole: String): Result<String> {
         return try {
-            auth.signInWithEmailAndPassword(email, pass).await()
+
+            val authResult = auth.signInWithEmailAndPassword(email, pass).await()
+            val uid = authResult.user?.uid ?: throw Exception("Authentication failed")
+
+            val document = db.collection("users").document(uid).get().await()
+            val storedRole = document.getString("role")
+
+            if (storedRole != null && !storedRole.equals(selectedRole, ignoreCase = true)) {
+                auth.signOut()
+                throw Exception("Account registered as ${storedRole.uppercase()}. Please select correct role.")
+            }
+
             Result.success("Login Successful")
         } catch (e: Exception) {
+
+            if (auth.currentUser != null) auth.signOut()
             Result.failure(e)
         }
     }
@@ -55,10 +67,9 @@ class AuthRepository @Inject constructor(
         return GoogleSignIn.getClient(context, gso).signInIntent
     }
 
-
-    suspend fun signInWithGoogle(intent: Intent, role: String): Result<String> {
+    suspend fun signInWithGoogle(intent: Intent, selectedRole: String): Result<String> {
         return try {
-
+            // A. Google Auth
             val task = GoogleSignIn.getSignedInAccountFromIntent(intent)
             val account = task.await()
             val idToken = account.idToken ?: throw Exception("Google ID Token missing")
@@ -76,11 +87,20 @@ class AuthRepository @Inject constructor(
                     "uid" to user.uid,
                     "name" to (user.displayName ?: "Google User"),
                     "email" to (user.email ?: ""),
-                    "role" to role // Use the role selected in UI
+                    "role" to selectedRole
                 )
                 docRef.set(newUser).await()
-                Result.success("Account Created as $role")
+                Result.success("Account Created as $selectedRole")
             } else {
+                val storedRole = doc.getString("role")
+                if (storedRole != null && !storedRole.equals(selectedRole, ignoreCase = true)) {
+                    auth.signOut()
+                    // Sign out of Google Client too to force re-selection next time if needed
+                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
+                    GoogleSignIn.getClient(context, gso).signOut()
+
+                    throw Exception("This Google account is registered as ${storedRole.uppercase()}. Please switch role.")
+                }
 
                 Result.success("Welcome back")
             }

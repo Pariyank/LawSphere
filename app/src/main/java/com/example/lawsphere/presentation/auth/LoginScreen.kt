@@ -52,7 +52,9 @@ fun LoginScreen(
     LaunchedEffect(authState) {
         when (authState) {
             is AuthState.Success -> onLoginSuccess()
-            is AuthState.Error -> Toast.makeText(context, (authState as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+            is AuthState.Error -> {
+                Toast.makeText(context, (authState as AuthState.Error).message, Toast.LENGTH_LONG).show()
+            }
             else -> {}
         }
     }
@@ -129,10 +131,14 @@ fun LoginScreen(
                 Button(
                     onClick = {
                         if (selectedRole == null) {
-                            Toast.makeText(context, "Please select a Role first (Citizen or Lawyer)", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Please select a Role first", Toast.LENGTH_SHORT).show()
                         } else {
-                            if (isLoginMode) viewModel.login(email, password)
-                            else viewModel.signup(email, password, name, selectedRole!!)
+                            if (isLoginMode) {
+
+                                viewModel.login(email, password, selectedRole!!)
+                            } else {
+                                viewModel.signup(email, password, name, selectedRole!!)
+                            }
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
@@ -141,20 +147,21 @@ fun LoginScreen(
                     if (authState is AuthState.Loading) {
                         CircularProgressIndicator(color = Color.Black, modifier = Modifier.size(24.dp))
                     } else {
-                        Text(if (isLoginMode) "Login" else "Sign Up", color = Color.Black, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = if (isLoginMode) "Login" else "Sign Up",
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-
                 Button(
                     onClick = {
                         if (selectedRole == null) {
-
-                            Toast.makeText(context, "Please select a Role first (Citizen or Lawyer)", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Please select a Role first", Toast.LENGTH_SHORT).show()
                         } else {
-
                             val signInIntent = viewModel.getGoogleLoginIntent()
                             googleSignInLauncher.launch(signInIntent)
                         }
@@ -188,7 +195,7 @@ fun RoleChip(label: String, isSelected: Boolean, onClick: () -> Unit) {
     ) {
         Text(
             text = label,
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 10.dp), // Bigger touch area
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 10.dp),
             color = if (isSelected) Color.Black else Color.White,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
         )
