@@ -5,7 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.lawsphere.data.api.LawApi
 import com.example.lawsphere.data.model.ChatRequest
 import com.example.lawsphere.data.model.CompareRequest
-import com.example.lawsphere.data.utils.AppPreferences // 🟢 Import
+import com.example.lawsphere.data.repository.ChatRepository
+import com.example.lawsphere.data.utils.AppPreferences
 import com.example.lawsphere.domain.model.ChatMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val api: LawApi
+    private val api: LawApi,
+    private val chatRepository: ChatRepository
 ) : ViewModel() {
 
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
@@ -29,12 +31,28 @@ class ChatViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
+    init {
+
+        loadChatHistory()
+    }
+
+    private fun loadChatHistory() {
+        viewModelScope.launch {
+            chatRepository.getChatHistory().collect { history ->
+                _messages.value = history
+            }
+        }
+    }
+
     fun sendMessage(query: String) {
         if (query.isBlank()) return
 
-        _messages.value += ChatMessage(text = query, isUser = true)
+        val userMsg = ChatMessage(text = query, isUser = true)
 
         viewModelScope.launch {
+
+            chatRepository.saveMessage(userMsg)
+
             _isLoading.value = true
             try {
 
@@ -48,19 +66,31 @@ class ChatViewModel @Inject constructor(
                     "Source ${it.sourceNumber}"
                 } ?: emptyList()
 
-                _messages.value += ChatMessage(
+                val aiMsg = ChatMessage(
                     text = response.formattedAnswer ?: "No answer received.",
                     isUser = false,
                     sources = sourceList
                 )
+                chatRepository.saveMessage(aiMsg)
 
             } catch (e: Exception) {
                 e.printStackTrace()
-                _messages.value += ChatMessage(
-                    text = "Error: ${e.localizedMessage ?: "Unknown Connection Error"}",
-                    isUser = false
+
+                chatRepository.saveMessage(
+                    ChatMessage(
+                        text = "Error: ${e.localizedMessage ?: "Unknown Connection Error"}",
+                        isUser = false
+                    )
                 )
             }
+            _isLoading.value = false
+        }
+    }
+
+    fun deleteHistory() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            chatRepository.clearChatHistory()
             _isLoading.value = false
         }
     }

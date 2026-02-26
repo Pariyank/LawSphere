@@ -1,8 +1,9 @@
 package com.example.lawsphere.domain.model
 
 data class ChatMessage(
-    val text: String,
-    val isUser: Boolean,
+    val id: String = "",
+    val text: String = "",
+    val isUser: Boolean = false,
     val sources: List<String> = emptyList(),
     val timestamp: Long = System.currentTimeMillis()
 )

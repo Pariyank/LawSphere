@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Send
@@ -28,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.lawsphere.domain.model.ChatMessage
-import com.example.lawsphere.presentation.scanner.CameraScreen // Ensure this file exists
+import com.example.lawsphere.presentation.scanner.CameraScreen
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
 val GlassDark = Color(0xFF121212)
@@ -45,12 +46,40 @@ fun ChatScreen(
 
     var inputText by remember { mutableStateOf("") }
     var showCamera by remember { mutableStateOf(false) }
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     val listState = rememberLazyListState()
 
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.size - 1)
         }
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            containerColor = Color(0xFF1E1E1E),
+            title = { Text("Clear History?", color = Color.White) },
+            text = { Text("This will permanently delete all your chats.", color = Color.Gray) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.deleteHistory()
+                        showDeleteDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) {
+                    Text("Delete", color = Color.White)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel", color = Color.Gray)
+                }
+            }
+        )
     }
 
     if (showCamera) {
@@ -64,7 +93,9 @@ fun ChatScreen(
     } else {
         Scaffold(
             containerColor = GlassDark,
-            topBar = { GlassTopBar() },
+            topBar = {
+                GlassTopBar(onDeleteClick = { showDeleteDialog = true })
+            },
             bottomBar = {
                 ChatInput(
                     value = inputText,
@@ -83,25 +114,31 @@ fun ChatScreen(
                     .padding(padding)
                     .fillMaxSize()
             ) {
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(vertical = 16.dp)
-                ) {
-                    items(messages) { msg ->
-                        ChatBubble(msg)
+                if (messages.isEmpty() && !isLoading) {
+                    Box(modifier = Modifier.weight(1f).fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Ask LawSphere anything...", color = Color.Gray)
                     }
-                    if (isLoading) {
-                        item {
-                            Text(
-                                "LawSphere is researching...",
-                                color = Color.Gray,
-                                fontSize = 12.sp,
-                                modifier = Modifier.padding(start = 16.dp, top = 8.dp)
-                            )
+                } else {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(vertical = 16.dp)
+                    ) {
+                        items(messages) { msg ->
+                            ChatBubble(msg)
+                        }
+                        if (isLoading) {
+                            item {
+                                Text(
+                                    "LawSphere is researching...",
+                                    color = Color.Gray,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(start = 16.dp, top = 8.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -134,21 +171,11 @@ fun ChatBubble(message: ChatMessage) {
                 .padding(16.dp)
         ) {
             if (isUser) {
-                Text(
-                    text = message.text,
-                    color = textColor,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Text(text = message.text, color = textColor, style = MaterialTheme.typography.bodyMedium)
             } else {
-                MarkdownText(
-                    markdown = message.text,
-                    color = textColor,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                MarkdownText(markdown = message.text, color = textColor, style = MaterialTheme.typography.bodyMedium)
             }
         }
-
-        // 🟢 REMOVED THE SOURCE LIST HERE for cleaner UI
     }
 }
 
@@ -245,7 +272,7 @@ fun ChatInput(
 }
 
 @Composable
-fun GlassTopBar() {
+fun GlassTopBar(onDeleteClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -264,5 +291,12 @@ fun GlassTopBar() {
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp
         )
+
+        IconButton(
+            onClick = onDeleteClick,
+            modifier = Modifier.align(Alignment.CenterEnd)
+        ) {
+            Icon(Icons.Default.Delete, contentDescription = "Clear History", tint = Color.Gray)
+        }
     }
 }
