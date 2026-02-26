@@ -1,7 +1,6 @@
 package com.example.lawsphere.presentation.community
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,7 +21,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.lawsphere.domain.model.ForumPost
 import com.example.lawsphere.domain.model.LawyerProfile
-import com.example.lawsphere.domain.model.NewsArticle
 import com.example.lawsphere.presentation.chat.AccentGold
 import com.example.lawsphere.presentation.chat.GlassDark
 import com.example.lawsphere.presentation.chat.GlassSurface
@@ -33,11 +31,10 @@ fun CommunityScreen(
     viewModel: CommunityViewModel = hiltViewModel()
 ) {
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Directory", "Forum", "News")
+    val tabs = listOf("Directory", "Forum")
 
     val lawyers by viewModel.lawyers.collectAsState()
     val posts by viewModel.posts.collectAsState()
-    val news by viewModel.news.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
     Column(
@@ -46,7 +43,6 @@ fun CommunityScreen(
             .background(GlassDark)
             .padding(16.dp)
     ) {
-
         Text("Legal Community", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -89,40 +85,43 @@ fun CommunityScreen(
             when (selectedTab) {
                 0 -> DirectoryList(lawyers)
                 1 -> ForumList(posts, userRole, viewModel)
-                2 -> NewsList(news)
             }
         }
     }
 }
-
 @Composable
 fun DirectoryList(lawyers: List<LawyerProfile>) {
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        items(lawyers) { lawyer ->
-            Card(
-                colors = CardDefaults.cardColors(containerColor = GlassSurface),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+    if (lawyers.isEmpty()) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("No Lawyers found.", color = Color.Gray)
+        }
+    } else {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            items(lawyers) { lawyer ->
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = GlassSurface),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier.size(50.dp).background(Color.Gray.copy(0.3f), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(lawyer.name.take(1), color = AccentGold, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                        }
 
-                    Box(
-                        modifier = Modifier.size(50.dp).background(Color.Gray.copy(0.3f), CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(lawyer.name.take(1), color = AccentGold, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                    }
+                        Spacer(modifier = Modifier.width(16.dp))
 
-                    Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(lawyer.name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            Text(lawyer.specialization, color = AccentGold, fontSize = 12.sp)
+                            Text("${lawyer.experience} Yrs Exp • ${lawyer.location}", color = Color.Gray, fontSize = 12.sp)
+                        }
 
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(lawyer.name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                        Text(lawyer.specialization, color = AccentGold, fontSize = 12.sp)
-                        Text("${lawyer.experience} Yrs Exp • ${lawyer.location}", color = Color.Gray, fontSize = 12.sp)
-                    }
-
-                    IconButton(onClick = { /* TODO: Call Intent */ }) {
-                        Icon(Icons.Default.Call, contentDescription = "Call", tint = Color.Green)
+                        IconButton(onClick = { /* TODO: Call Intent */ }) {
+                            Icon(Icons.Default.Call, contentDescription = "Call", tint = Color.Green)
+                        }
                     }
                 }
             }
@@ -135,36 +134,18 @@ fun ForumList(posts: List<ForumPost>, userRole: String, viewModel: CommunityView
     var showAskDialog by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-
         if (posts.isEmpty()) {
             Column(
                 modifier = Modifier.align(Alignment.Center),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    imageVector = Icons.Default.QuestionAnswer,
-                    contentDescription = null,
-                    tint = Color.Gray,
-                    modifier = Modifier.size(60.dp)
-                )
+                Icon(Icons.Default.QuestionAnswer, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(60.dp))
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "No discussions yet.",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Be the first to ask a legal question!",
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
+                Text("No discussions yet.", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text("Be the first to ask a legal question!", color = Color.Gray, fontSize = 14.sp)
             }
         } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(bottom = 80.dp)
-            ) {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(bottom = 80.dp)) {
                 items(posts) { post ->
                     ForumCard(post, userRole, viewModel)
                 }
@@ -173,9 +154,7 @@ fun ForumList(posts: List<ForumPost>, userRole: String, viewModel: CommunityView
 
         FloatingActionButton(
             onClick = { showAskDialog = true },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp), // Added padding
+            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
             containerColor = AccentGold
         ) {
             Icon(Icons.Default.Add, contentDescription = "Ask", tint = Color.Black)
@@ -236,10 +215,7 @@ fun ForumCard(post: ForumPost, userRole: String, viewModel: CommunityViewModel) 
                             onValueChange = { answerText = it },
                             placeholder = { Text("Write professional advice...", color = Color.Gray, fontSize = 12.sp) },
                             modifier = Modifier.weight(1f),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = Color.White,
-                                unfocusedTextColor = Color.White
-                            )
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White)
                         )
                         IconButton(onClick = {
                             if (answerText.isNotBlank()) {
@@ -284,28 +260,4 @@ fun AskQuestionDialog(onDismiss: () -> Unit, onPost: (String, String) -> Unit) {
             }
         }
     )
-}
-
-@Composable
-fun NewsList(news: List<NewsArticle>) {
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        items(news) { article ->
-            Card(
-                colors = CardDefaults.cardColors(containerColor = GlassSurface),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(article.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(article.description, color = Color.Gray, fontSize = 14.sp)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                        Text(article.source, color = AccentGold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                        Text(article.date, color = Color.Gray, fontSize = 12.sp)
-                    }
-                }
-            }
-        }
-    }
 }

@@ -1,19 +1,15 @@
 package com.example.lawsphere.data.repository
 
-import com.example.lawsphere.data.api.LawApi
 import com.example.lawsphere.domain.model.ForumAnswer
 import com.example.lawsphere.domain.model.ForumPost
 import com.example.lawsphere.domain.model.LawyerProfile
-import com.example.lawsphere.domain.model.NewsArticle
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-class CommunityRepository @Inject constructor(
-    private val api: LawApi
-) {
+class CommunityRepository @Inject constructor() {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
@@ -75,19 +71,6 @@ class CommunityRepository @Inject constructor(
             Result.success(true)
         } catch (e: Exception) {
             Result.failure(e)
-        }
-    }
-
-    suspend fun getLegalNews(): List<NewsArticle> {
-        return try {
-
-            api.getLegalNews()
-        } catch (e: Exception) {
-            e.printStackTrace()
-
-            listOf(
-                NewsArticle("Connection Error", "Could not fetch latest news.", "System", "Now")
-            )
         }
     }
 }

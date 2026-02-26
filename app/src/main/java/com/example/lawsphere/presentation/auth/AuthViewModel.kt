@@ -46,33 +46,15 @@ class AuthViewModel @Inject constructor(
         return repository.getGoogleSignInIntent()
     }
 
-    fun handleGoogleSignInResult(intent: Intent) {
+    fun handleGoogleSignInResult(intent: Intent, role: String) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
-            val result = repository.signInWithGoogle(intent)
+            val result = repository.signInWithGoogle(intent, role)
 
-            result.onSuccess { isExistingUser ->
-                if (isExistingUser) {
-
-                    _authState.value = AuthState.Success
-                } else {
-
-                    _authState.value = AuthState.RoleSelectionRequired
-                }
-            }.onFailure {
-                _authState.value = AuthState.Error(it.message ?: "Google Sign-In Failed")
-            }
-        }
-    }
-
-    fun finalizeGoogleLogin(role: String) {
-        viewModelScope.launch {
-            _authState.value = AuthState.Loading
-            val result = repository.createGoogleUserFirestore(role)
             result.onSuccess {
                 _authState.value = AuthState.Success
             }.onFailure {
-                _authState.value = AuthState.Error("Failed to save role")
+                _authState.value = AuthState.Error(it.message ?: "Google Sign-In Failed")
             }
         }
     }
@@ -82,6 +64,5 @@ sealed class AuthState {
     object Idle : AuthState()
     object Loading : AuthState()
     object Success : AuthState()
-    object RoleSelectionRequired : AuthState() // 🟢 New State
     data class Error(val message: String) : AuthState()
 }

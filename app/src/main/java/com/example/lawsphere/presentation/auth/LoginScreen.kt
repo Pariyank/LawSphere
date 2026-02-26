@@ -34,17 +34,17 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
-    var selectedRole by remember { mutableStateOf("citizen") }
 
-    var showGoogleRoleDialog by remember { mutableStateOf(false) }
+    var selectedRole by remember { mutableStateOf<String?>(null) }
 
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data = result.data
-            if (data != null) {
-                viewModel.handleGoogleSignInResult(data)
+            if (data != null && selectedRole != null) {
+
+                viewModel.handleGoogleSignInResult(data, selectedRole!!)
             }
         }
     }
@@ -52,44 +52,9 @@ fun LoginScreen(
     LaunchedEffect(authState) {
         when (authState) {
             is AuthState.Success -> onLoginSuccess()
-            is AuthState.RoleSelectionRequired -> showGoogleRoleDialog = true
             is AuthState.Error -> Toast.makeText(context, (authState as AuthState.Error).message, Toast.LENGTH_SHORT).show()
             else -> {}
         }
-    }
-
-    if (showGoogleRoleDialog) {
-        AlertDialog(
-            onDismissRequest = {},
-            containerColor = Color(0xFF1E1E1E),
-            title = { Text("Select Your Role", color = Color.White, fontWeight = FontWeight.Bold) },
-            text = { Text("To customize your experience, please tell us who you are:", color = Color.Gray) },
-            confirmButton = {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Button(
-                        onClick = {
-                            viewModel.finalizeGoogleLogin("citizen")
-                            showGoogleRoleDialog = false
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = AccentGold)
-                    ) {
-                        Text("I am a Citizen", color = Color.Black)
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = {
-                            viewModel.finalizeGoogleLogin("lawyer")
-                            showGoogleRoleDialog = false
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
-                    ) {
-                        Text("I am a Lawyer", color = Color.White)
-                    }
-                }
-            }
-        )
     }
 
     Box(
@@ -117,60 +82,82 @@ fun LoginScreen(
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
+                Text("Select Your Role:", color = Color.Gray, fontSize = 12.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    RoleChip("Citizen", selectedRole == "citizen") { selectedRole = "citizen" }
+                    RoleChip("Lawyer", selectedRole == "lawyer") { selectedRole = "lawyer" }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
                 if (!isLoginMode) {
                     OutlinedTextField(
-                        value = name, onValueChange = { name = it },
+                        value = name,
+                        onValueChange = { name = it },
                         label = { Text("Full Name", color = Color.Gray) },
-                        modifier = Modifier.fillMaxWidth(), singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
                         colors = fieldColors()
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        RoleChip("Citizen", selectedRole == "citizen") { selectedRole = "citizen" }
-                        RoleChip("Lawyer", selectedRole == "lawyer") { selectedRole = "lawyer" }
-                    }
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
                 OutlinedTextField(
-                    value = email, onValueChange = { email = it },
+                    value = email,
+                    onValueChange = { email = it },
                     label = { Text("Email", color = Color.Gray) },
-                    modifier = Modifier.fillMaxWidth(), singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
                     colors = fieldColors()
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
                 OutlinedTextField(
-                    value = password, onValueChange = { password = it },
+                    value = password,
+                    onValueChange = { password = it },
                     label = { Text("Password", color = Color.Gray) },
                     visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth(), singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
                     colors = fieldColors()
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
                     onClick = {
-                        if (isLoginMode) viewModel.login(email, password)
-                        else viewModel.signup(email, password, name, selectedRole)
+                        if (selectedRole == null) {
+                            Toast.makeText(context, "Please select a Role first (Citizen or Lawyer)", Toast.LENGTH_SHORT).show()
+                        } else {
+                            if (isLoginMode) viewModel.login(email, password)
+                            else viewModel.signup(email, password, name, selectedRole!!)
+                        }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = AccentGold)
                 ) {
-                    if (authState is AuthState.Loading && !showGoogleRoleDialog) {
+                    if (authState is AuthState.Loading) {
                         CircularProgressIndicator(color = Color.Black, modifier = Modifier.size(24.dp))
                     } else {
-                        Text(if (isLoginMode) "Login" else "Sign Up", color = Color.Black)
+                        Text(if (isLoginMode) "Login" else "Sign Up", color = Color.Black, fontWeight = FontWeight.Bold)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+
                 Button(
                     onClick = {
-                        val signInIntent = viewModel.getGoogleLoginIntent()
-                        googleSignInLauncher.launch(signInIntent)
+                        if (selectedRole == null) {
+
+                            Toast.makeText(context, "Please select a Role first (Citizen or Lawyer)", Toast.LENGTH_SHORT).show()
+                        } else {
+
+                            val signInIntent = viewModel.getGoogleLoginIntent()
+                            googleSignInLauncher.launch(signInIntent)
+                        }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White),
@@ -196,9 +183,15 @@ fun RoleChip(label: String, isSelected: Boolean, onClick: () -> Unit) {
     Surface(
         color = if (isSelected) AccentGold else Color.DarkGray,
         shape = RoundedCornerShape(20.dp),
-        modifier = Modifier.clickable { onClick() }
+        modifier = Modifier.clickable { onClick() },
+        border = if (isSelected) null else androidx.compose.foundation.BorderStroke(1.dp, Color.Gray)
     ) {
-        Text(text = label, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp), color = if (isSelected) Color.Black else Color.White)
+        Text(
+            text = label,
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 10.dp), // Bigger touch area
+            color = if (isSelected) Color.Black else Color.White,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+        )
     }
 }
 

@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.lawsphere.data.repository.CommunityRepository
 import com.example.lawsphere.domain.model.ForumPost
 import com.example.lawsphere.domain.model.LawyerProfile
-import com.example.lawsphere.domain.model.NewsArticle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,14 +16,12 @@ class CommunityViewModel @Inject constructor(
     private val repository: CommunityRepository
 ) : ViewModel() {
 
+
     private val _lawyers = MutableStateFlow<List<LawyerProfile>>(emptyList())
     val lawyers = _lawyers.asStateFlow()
 
     private val _posts = MutableStateFlow<List<ForumPost>>(emptyList())
     val posts = _posts.asStateFlow()
-
-    private val _news = MutableStateFlow<List<NewsArticle>>(emptyList())
-    val news = _news.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
@@ -38,10 +35,7 @@ class CommunityViewModel @Inject constructor(
             _isLoading.value = true
 
             repository.getLawyers().onSuccess { _lawyers.value = it }
-
             repository.getPosts().onSuccess { _posts.value = it }
-
-            _news.value = repository.getLegalNews()
 
             _isLoading.value = false
         }

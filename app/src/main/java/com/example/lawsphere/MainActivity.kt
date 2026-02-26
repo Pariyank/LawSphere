@@ -7,6 +7,8 @@ import androidx.compose.runtime.*
 import com.example.lawsphere.presentation.auth.LoginScreen
 import com.example.lawsphere.presentation.main.MainScreen
 import com.example.lawsphere.presentation.splash.SplashScreen
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,9 +31,7 @@ class MainActivity : ComponentActivity() {
                 val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
                     isLoggedIn = firebaseAuth.currentUser != null
                 }
-
                 auth.addAuthStateListener(listener)
-
                 onDispose {
                     auth.removeAuthStateListener(listener)
                 }
@@ -46,6 +46,7 @@ class MainActivity : ComponentActivity() {
                             .document(uid)
                             .get()
                             .addOnSuccessListener { document ->
+
                                 userRole = document.getString("role") ?: "citizen"
                             }
                             .addOnFailureListener {
@@ -56,24 +57,26 @@ class MainActivity : ComponentActivity() {
             }
 
             if (showSplash) {
-
                 SplashScreen(
                     onSplashFinished = { showSplash = false }
                 )
-
             } else {
-
                 if (isLoggedIn) {
-
                     MainScreen(
                         userRole = userRole,
                         onLogout = {
-                            auth.signOut()
+
+                            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
+                            val googleSignInClient = GoogleSignIn.getClient(this@MainActivity, gso)
+
+                            googleSignInClient.signOut().addOnCompleteListener {
+
+                                auth.signOut()
+                                isLoggedIn = false
+                            }
                         }
                     )
-
                 } else {
-
                     LoginScreen(
                         onLoginSuccess = {
 
