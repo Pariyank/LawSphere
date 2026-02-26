@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.lawsphere.presentation.awareness.CitizenGuideScreen
 import com.example.lawsphere.presentation.awareness.MapsScreen
 import com.example.lawsphere.presentation.chat.AccentGold
@@ -22,19 +23,19 @@ import com.example.lawsphere.presentation.chat.ChatScreen
 import com.example.lawsphere.presentation.community.CommunityScreen
 import com.example.lawsphere.presentation.dashboard.CaseDashboardScreen
 import com.example.lawsphere.presentation.drafting.DraftingScreen
+import com.example.lawsphere.presentation.explorer.CompareScreen
 import com.example.lawsphere.presentation.explorer.RoadmapScreen
 import com.example.lawsphere.presentation.explorer.SectionExplorerScreen
-import com.example.lawsphere.presentation.explorer.CompareScreen // ✅ Import Compare
 
+// 🟢 FIX 1: Shortened Titles for better fit
 sealed class BottomNavItem(val title: String, val icon: ImageVector) {
     object Chat : BottomNavItem("Chat", Icons.Default.Chat)
     object Explorer : BottomNavItem("BNS", Icons.Default.Article)
+    object Community : BottomNavItem("Forum", Icons.Default.Groups)
     object Drafting : BottomNavItem("Draft", Icons.Default.Gavel)
     object Dashboard : BottomNavItem("Cases", Icons.Default.BusinessCenter)
     object Guide : BottomNavItem("Help", Icons.Default.Info)
-
-    object Community : BottomNavItem("Community", Icons.Default.Groups)
-    object Profile : BottomNavItem("Profile", Icons.Default.Person)
+    object Profile : BottomNavItem("Me", Icons.Default.Person)
 }
 
 @Composable
@@ -75,11 +76,10 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
                 contentColor = AccentGold
             ) {
                 tabs.forEach { item ->
+                    val isSelected = currentTab == item && !showMap && !showRoadmap && !showCompare
+
                     NavigationBarItem(
-                        selected = currentTab == item &&
-                                !showMap &&
-                                !showRoadmap &&
-                                !showCompare,
+                        selected = isSelected,
                         onClick = {
                             currentTab = item
                             showMap = false
@@ -87,7 +87,17 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
                             showCompare = false
                         },
                         icon = { Icon(item.icon, contentDescription = item.title) },
-                        label = { Text(item.title) },
+
+                        label = {
+                            if (isSelected) {
+                                Text(
+                                    text = item.title,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        },
+                        alwaysShowLabel = false,
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = Color.Black,
                             selectedTextColor = AccentGold,
@@ -104,49 +114,21 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
         Box(modifier = Modifier.padding(padding)) {
 
             when {
-                showCompare -> {
-                    CompareScreen(
-                        onBack = { showCompare = false }
-                    )
-                }
-
-                showMap -> {
-                    MapsScreen(
-                        onBack = { showMap = false }
-                    )
-                }
-
-                showRoadmap -> {
-                    RoadmapScreen(
-                        onBack = { showRoadmap = false }
-                    )
-                }
-
+                showCompare -> CompareScreen(onBack = { showCompare = false })
+                showMap -> MapsScreen(onBack = { showMap = false })
+                showRoadmap -> RoadmapScreen(onBack = { showRoadmap = false })
                 else -> {
                     when (currentTab) {
-
-                        BottomNavItem.Chat ->
-                            ChatScreen(onLogout = onLogout)
-
-                        BottomNavItem.Explorer ->
-                            SectionExplorerScreen(
-                                onOpenRoadmap = { showRoadmap = true },
-                                onOpenCompare = { showCompare = true }
-                            )
-
-                        BottomNavItem.Drafting ->
-                            DraftingScreen()
-
-                        BottomNavItem.Dashboard ->
-                            CaseDashboardScreen()
-
-                        BottomNavItem.Guide ->
-                            CitizenGuideScreen(
-                                onOpenMap = { showMap = true }
-                            )
-
-                        BottomNavItem.Profile -> ProfileScreen(onLogout = onLogout)
+                        BottomNavItem.Chat -> ChatScreen(onLogout = onLogout)
+                        BottomNavItem.Explorer -> SectionExplorerScreen(
+                            onOpenRoadmap = { showRoadmap = true },
+                            onOpenCompare = { showCompare = true }
+                        )
                         BottomNavItem.Community -> CommunityScreen(userRole = userRole)
+                        BottomNavItem.Drafting -> DraftingScreen()
+                        BottomNavItem.Dashboard -> CaseDashboardScreen()
+                        BottomNavItem.Guide -> CitizenGuideScreen(onOpenMap = { showMap = true })
+                        BottomNavItem.Profile -> ProfileScreen(onLogout = onLogout)
                     }
                 }
             }

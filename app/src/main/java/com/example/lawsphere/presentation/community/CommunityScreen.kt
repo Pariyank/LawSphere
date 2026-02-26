@@ -135,15 +135,47 @@ fun ForumList(posts: List<ForumPost>, userRole: String, viewModel: CommunityView
     var showAskDialog by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(bottom = 80.dp)) {
-            items(posts) { post ->
-                ForumCard(post, userRole, viewModel)
+
+        if (posts.isEmpty()) {
+            Column(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Default.QuestionAnswer,
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier.size(60.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "No discussions yet.",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Be the first to ask a legal question!",
+                    color = Color.Gray,
+                    fontSize = 14.sp
+                )
+            }
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(bottom = 80.dp)
+            ) {
+                items(posts) { post ->
+                    ForumCard(post, userRole, viewModel)
+                }
             }
         }
 
         FloatingActionButton(
             onClick = { showAskDialog = true },
-            modifier = Modifier.align(Alignment.BottomEnd),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp), // Added padding
             containerColor = AccentGold
         ) {
             Icon(Icons.Default.Add, contentDescription = "Ask", tint = Color.Black)
