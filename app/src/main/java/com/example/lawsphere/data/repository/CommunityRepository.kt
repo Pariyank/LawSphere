@@ -1,5 +1,6 @@
 package com.example.lawsphere.data.repository
 
+import com.example.lawsphere.data.api.LawApi
 import com.example.lawsphere.domain.model.ForumAnswer
 import com.example.lawsphere.domain.model.ForumPost
 import com.example.lawsphere.domain.model.LawyerProfile
@@ -10,7 +11,9 @@ import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-class CommunityRepository @Inject constructor() {
+class CommunityRepository @Inject constructor(
+    private val api: LawApi
+) {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
@@ -75,12 +78,16 @@ class CommunityRepository @Inject constructor() {
         }
     }
 
-    fun getLegalNews(): List<NewsArticle> {
-        return listOf(
-            NewsArticle("Supreme Court on BNS", "SC clarifies retrospective applicability of new criminal laws in pending cases.", "LiveLaw", "2 Hours ago"),
-            NewsArticle("High Court Digitization", "Delhi High Court launches new e-filing portal for faster processing.", "Bar & Bench", "5 Hours ago"),
-            NewsArticle("Data Privacy Act", "New amendments proposed to the Digital Personal Data Protection Act.", "The Hindu", "1 Day ago"),
-            NewsArticle("Bail Reforms", "Govt issues new guidelines for bail in economic offenses under BNS.", "Times of India", "2 Days ago")
-        )
+    suspend fun getLegalNews(): List<NewsArticle> {
+        return try {
+
+            api.getLegalNews()
+        } catch (e: Exception) {
+            e.printStackTrace()
+
+            listOf(
+                NewsArticle("Connection Error", "Could not fetch latest news.", "System", "Now")
+            )
+        }
     }
 }

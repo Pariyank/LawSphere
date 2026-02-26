@@ -59,47 +59,38 @@ android {
 }
 
 dependencies {
-    // Core Android - Pinned to stable versions for SDK 34
+   
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
 
-    // FORCE Compatible Credentials library (Fixes the API 35 error)
     implementation("androidx.credentials:credentials:1.2.2")
     implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
 
-    // Jetpack Compose BOM
+
     implementation(platform("androidx.compose:compose-bom:2024.02.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
 
-    // Icons
     implementation("androidx.compose.material:material-icons-extended")
 
-    // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
-    // Hilt (Dependency Injection)
     implementation("com.google.dagger:hilt-android:2.50")
     kapt("com.google.dagger:hilt-compiler:2.50")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
-    // Retrofit (Networking)
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    // Firebase
-    // We use 32.7.0 because 33.x requires API 35
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
 
-    // Markdown
     implementation("com.github.jeziellago:compose-markdown:0.5.0")
 
-    // Debugging
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
@@ -111,9 +102,9 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.3.1")
     implementation("androidx.camera:camera-view:1.3.1")
 
-    // Google ML Kit (Text Recognition)
     implementation("com.google.mlkit:text-recognition:16.0.0")
 
-    // Permission Handling
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
 }

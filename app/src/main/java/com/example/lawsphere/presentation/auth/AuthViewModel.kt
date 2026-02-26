@@ -1,5 +1,6 @@
 package com.example.lawsphere.presentation.auth
 
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lawsphere.data.repository.AuthRepository
@@ -40,11 +41,47 @@ class AuthViewModel @Inject constructor(
             }
         }
     }
+
+    fun getGoogleLoginIntent(): Intent {
+        return repository.getGoogleSignInIntent()
+    }
+
+    fun handleGoogleSignInResult(intent: Intent) {
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            val result = repository.signInWithGoogle(intent)
+
+            result.onSuccess { isExistingUser ->
+                if (isExistingUser) {
+
+                    _authState.value = AuthState.Success
+                } else {
+
+                    _authState.value = AuthState.RoleSelectionRequired
+                }
+            }.onFailure {
+                _authState.value = AuthState.Error(it.message ?: "Google Sign-In Failed")
+            }
+        }
+    }
+
+    fun finalizeGoogleLogin(role: String) {
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            val result = repository.createGoogleUserFirestore(role)
+            result.onSuccess {
+                _authState.value = AuthState.Success
+            }.onFailure {
+                _authState.value = AuthState.Error("Failed to save role")
+            }
+        }
+    }
 }
 
 sealed class AuthState {
     object Idle : AuthState()
     object Loading : AuthState()
     object Success : AuthState()
+    object RoleSelectionRequired : AuthState() // 🟢 New State
     data class Error(val message: String) : AuthState()
 }

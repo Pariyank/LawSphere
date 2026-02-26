@@ -12,7 +12,20 @@
           "package_name": "com.example.lawsphere"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "395261422786-aciusufal5tc6jgtqrqbqhervdu2b3sj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.lawsphere",
+            "certificate_hash": "7cf31aef01ec730c2bd68e80f0583ea1c3596bd9"
+          }
+        },
+        {
+          "client_id": "395261422786-rol2ojohv702ktubra5o0asa1e0pvfvl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAPbDbFyGkVxygpr7PUCZwkc9Z144RGHMQ"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "395261422786-rol2ojohv702ktubra5o0asa1e0pvfvl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
