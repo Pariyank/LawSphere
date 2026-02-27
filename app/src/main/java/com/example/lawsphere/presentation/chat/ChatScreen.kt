@@ -7,15 +7,18 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,6 +28,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -46,7 +50,6 @@ fun ChatScreen(
 
     var inputText by remember { mutableStateOf("") }
     var showCamera by remember { mutableStateOf(false) }
-
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
@@ -115,9 +118,11 @@ fun ChatScreen(
                     .fillMaxSize()
             ) {
                 if (messages.isEmpty() && !isLoading) {
-                    Box(modifier = Modifier.weight(1f).fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Ask LawSphere anything...", color = Color.Gray)
-                    }
+                    EmptyChatState(
+                        onSuggestionClick = { suggestion ->
+                            viewModel.sendMessage(suggestion)
+                        }
+                    )
                 } else {
                     LazyColumn(
                         state = listState,
@@ -133,7 +138,7 @@ fun ChatScreen(
                         if (isLoading) {
                             item {
                                 Text(
-                                    "LawSphere is researching...",
+                                    "Consulting the BNS...",
                                     color = Color.Gray,
                                     fontSize = 12.sp,
                                     modifier = Modifier.padding(start = 16.dp, top = 8.dp)
@@ -143,6 +148,84 @@ fun ChatScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun EmptyChatState(onSuggestionClick: (String) -> Unit) {
+    val suggestions = listOf(
+        "Punishment for Mob Lynching?",
+        "What is Section 69 of BNS?",
+        "Difference between Theft and Snatching?",
+        "Is Section 103 Bailable?"
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.Scale,
+            contentDescription = "Logo",
+            tint = AccentGold,
+            modifier = Modifier.size(50.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "LawSphere AI",
+            color = Color.White,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(
+            text = "Your intelligent guide to the Bharatiya Nyaya Sanhita (BNS).",
+            color = Color.Gray,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = "Try asking:",
+            color = Color.Gray,
+            fontSize = 12.sp,
+            modifier = Modifier.align(Alignment.Start)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        suggestions.forEach { suggestion ->
+            OutlinedButton(
+                onClick = { onSuggestionClick(suggestion) },
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = GlassSurface,
+                    contentColor = Color.White
+                ),
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    Color.Gray.copy(0.3f)
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp)
+            ) {
+                Text(
+                    text = suggestion,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Normal
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
@@ -221,7 +304,7 @@ fun ChatInput(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier.weight(1f),
-            placeholder = { Text("Ask or Scan...", color = Color.Gray) },
+            placeholder = { Text("Ask about offences...", color = Color.Gray) },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = AccentGold,
                 unfocusedBorderColor = Color.Gray,
@@ -285,12 +368,12 @@ fun GlassTopBar(onDeleteClick: () -> Unit) {
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "LawSphere AI",
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
-        )
+//        Text(
+//            text = "LawSphere",
+//            color = Color.White,
+//            fontWeight = FontWeight.Bold,
+//            fontSize = 20.sp
+//        )
 
         IconButton(
             onClick = onDeleteClick,
