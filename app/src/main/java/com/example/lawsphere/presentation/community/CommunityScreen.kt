@@ -8,7 +8,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.filled.QuestionAnswer
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,7 +32,8 @@ import com.example.lawsphere.presentation.chat.GlassSurface
 @Composable
 fun CommunityScreen(
     userRole: String,
-    viewModel: CommunityViewModel = hiltViewModel()
+    viewModel: CommunityViewModel = hiltViewModel(),
+    onLawyerSelected: (LawyerProfile) -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Directory", "Forum")
@@ -83,14 +88,18 @@ fun CommunityScreen(
             }
         } else {
             when (selectedTab) {
-                0 -> DirectoryList(lawyers)
+                0 -> DirectoryList(lawyers, onChatClick = onLawyerSelected)
                 1 -> ForumList(posts, userRole, viewModel)
             }
         }
     }
 }
+
 @Composable
-fun DirectoryList(lawyers: List<LawyerProfile>) {
+fun DirectoryList(
+    lawyers: List<LawyerProfile>,
+    onChatClick: (LawyerProfile) -> Unit
+) {
     if (lawyers.isEmpty()) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("No Lawyers found.", color = Color.Gray)
@@ -104,6 +113,7 @@ fun DirectoryList(lawyers: List<LawyerProfile>) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+
                         Box(
                             modifier = Modifier.size(50.dp).background(Color.Gray.copy(0.3f), CircleShape),
                             contentAlignment = Alignment.Center
@@ -119,8 +129,11 @@ fun DirectoryList(lawyers: List<LawyerProfile>) {
                             Text("${lawyer.experience} Yrs Exp • ${lawyer.location}", color = Color.Gray, fontSize = 12.sp)
                         }
 
-                        IconButton(onClick = { /* TODO: Call Intent */ }) {
-                            Icon(Icons.Default.Call, contentDescription = "Call", tint = Color.Green)
+                        IconButton(
+                            onClick = { onChatClick(lawyer) },
+                            colors = IconButtonDefaults.iconButtonColors(containerColor = AccentGold.copy(alpha = 0.1f))
+                        ) {
+                            Icon(Icons.Default.Message, contentDescription = "Consult", tint = AccentGold)
                         }
                     }
                 }

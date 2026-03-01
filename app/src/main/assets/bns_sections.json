@@ -37,5 +37,117 @@
       "Anurag Soni v. State of Chhattisgarh",
       "Deelip Singh v. State of Bihar"
     ]
+  },
+  {
+    "chapter": "VI",
+    "section": "109",
+    "title": "Attempt to Murder",
+    "description": "Whoever does any act with such intention or knowledge, and under such circumstances that, if death were caused, would amount to murder, shall be punished.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Imprisonment up to 10 years or Life + Fine",
+    "cases": [
+      "Two held on charge of murder attempt – Pune scrap vendors case under BNS 109",
+      "3 arrested for abduction & attempt to murder – Bhamboli village extortion case"
+    ]
+  },
+  {
+    "chapter": "VI",
+    "section": "115",
+    "title": "Voluntarily Causing Hurt",
+    "description": "Whoever voluntarily causes hurt shall be punished.",
+    "cognizable": "Yes",
+    "bailable": "Yes",
+    "punishment": "Imprisonment up to 1 year or Fine or Both",
+    "cases": []
+  },
+  {
+    "chapter": "VII",
+    "section": "128",
+    "title": "Wrongful Restraint",
+    "description": "Whoever voluntarily obstructs any person so as to prevent that person from proceeding in any direction in which that person has a right to proceed commits wrongful restraint.",
+    "cognizable": "Yes",
+    "bailable": "Yes",
+    "punishment": "Imprisonment up to 1 month or Fine or Both",
+    "cases": []
+  },
+  {
+    "chapter": "XVIII",
+    "section": "316",
+    "title": "Criminal Breach of Trust",
+    "description": "Whoever, being entrusted with property or dominion over property, dishonestly misappropriates or converts it to own use commits criminal breach of trust.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Imprisonment up to 5 years + Fine",
+    "cases": [
+      "Case against supplier for duping firm of ₹8.3 lakh – Criminal breach & cheating charges"
+    ]
+  },
+  {
+    "chapter": "XVIII",
+    "section": "318",
+    "title": "Cheating",
+    "description": "Whoever, by deceiving any person, fraudulently or dishonestly induces delivery of property or consent, commits cheating.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Imprisonment up to 7 years + Fine",
+    "cases": [
+      "Woman books kin for cheating her of ₹25 lakh – Pune cheating case",
+      "Four family members booked for cheating Dighi resident of ₹13.5 lakh"
+    ]
+  },
+  {
+    "chapter": "XVIII",
+    "section": "319",
+    "title": "Cheating by Personation",
+    "description": "Whoever cheats by pretending to be some other person commits cheating by personation.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Imprisonment up to 5 years + Fine",
+    "cases": []
+  },
+  {
+    "chapter": "XVII",
+    "section": "305",
+    "title": "Snatching",
+    "description": "Whoever, intending to commit theft, suddenly or quickly seizes movable property from a person commits snatching.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Imprisonment up to 3 years + Fine",
+    "cases": []
+  },
+  {
+    "chapter": "XVII",
+    "section": "309",
+    "title": "Robbery",
+    "description": "Theft or extortion becomes robbery when committed by causing or attempting to cause death, hurt, or wrongful restraint.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Rigorous imprisonment up to 10 years + Fine",
+    "cases": [
+      "Uttarakhand first FIR under BNS included robbery charge at Haridwar railway area"
+    ]
+  },
+  {
+    "chapter": "XVIII",
+    "section": "312",
+    "title": "Attempt to Commit Robbery or Dacoity when Armed with Deadly Weapon",
+    "description": "Whoever attempts to commit robbery or dacoity while armed with a deadly weapon shall be punished.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Imprisonment up to 10 years + Fine",
+    "cases": []
+  },
+  {
+    "chapter": "VI",
+    "section": "105",
+    "title": "Culpable Homicide",
+    "description": "Whoever causes death with the intention of causing death or such bodily injury as is likely to cause death shall be punished.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Life Imprisonment or Death + Fine",
+    "cases": [
+      "Bombay High Court holds BNS predicate offences under PMLA include culpable homicide provisions"
+    ]
   }
 ]

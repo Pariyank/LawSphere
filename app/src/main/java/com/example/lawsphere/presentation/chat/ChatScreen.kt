@@ -7,11 +7,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -24,9 +24,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -36,8 +36,9 @@ import com.example.lawsphere.domain.model.ChatMessage
 import com.example.lawsphere.presentation.scanner.CameraScreen
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
+
 val GlassDark = Color(0xFF121212)
-val GlassSurface = Color(0xFF1E1E1E).copy(alpha = 0.7f)
+val GlassSurface = Color(0xFF2E2E2E)
 val AccentGold = Color(0xFFD4AF37)
 
 @Composable
@@ -128,8 +129,7 @@ fun ChatScreen(
                         state = listState,
                         modifier = Modifier
                             .weight(1f)
-                            .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                            .padding(horizontal = 8.dp),
                         contentPadding = PaddingValues(vertical = 16.dp)
                     ) {
                         items(messages) { msg ->
@@ -137,12 +137,18 @@ fun ChatScreen(
                         }
                         if (isLoading) {
                             item {
-                                Text(
-                                    "Consulting the BNS...",
-                                    color = Color.Gray,
-                                    fontSize = 12.sp,
-                                    modifier = Modifier.padding(start = 16.dp, top = 8.dp)
-                                )
+                                Row(
+                                    modifier = Modifier.padding(start = 16.dp, top = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    CircularProgressIndicator(
+                                        color = AccentGold,
+                                        modifier = Modifier.size(16.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Thinking...", color = Color.Gray, fontSize = 12.sp)
+                                }
                             }
                         }
                     }
@@ -153,12 +159,72 @@ fun ChatScreen(
 }
 
 @Composable
+fun ChatBubble(message: ChatMessage) {
+    val isUser = message.isUser
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp, horizontal = 4.dp),
+        contentAlignment = if (isUser) Alignment.CenterEnd else Alignment.CenterStart
+    ) {
+        Row(
+            verticalAlignment = Alignment.Bottom,
+            modifier = Modifier.widthIn(max = 320.dp)
+        ) {
+            if (!isUser) {
+                Box(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .background(GlassSurface, CircleShape)
+                        .border(1.dp, AccentGold.copy(alpha = 0.3f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Scale,
+                        contentDescription = "AI",
+                        tint = AccentGold,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
+            Column(
+                modifier = Modifier
+                    .clip(
+                        if (isUser) RoundedCornerShape(18.dp, 18.dp, 2.dp, 18.dp) // User: Sharp Bottom-Right
+                        else RoundedCornerShape(18.dp, 18.dp, 18.dp, 2.dp)        // AI: Sharp Bottom-Left
+                    )
+                    .background(if (isUser) AccentGold else GlassSurface) // Gold vs Dark Gray
+                    .padding(12.dp)
+            ) {
+                if (isUser) {
+                    Text(
+                        text = message.text,
+                        color = Color.Black, // Black text on Gold
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                } else {
+                    MarkdownText(
+                        markdown = message.text,
+                        color = Color.White, // White text on Dark Gray
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun EmptyChatState(onSuggestionClick: (String) -> Unit) {
     val suggestions = listOf(
-        "Punishment for Mob Lynching?",
-        "What is Section 69 of BNS?",
-        "Difference between Theft and Snatching?",
-        "Is Section 103 Bailable?"
+        "Bail procedure under BNSS?",
+        "Punishment for Cyber Stalking?",
+        "Difference between Theft and Robbery?",
+        "Rights of an arrested person?"
     )
 
     Column(
@@ -170,45 +236,46 @@ fun EmptyChatState(onSuggestionClick: (String) -> Unit) {
     ) {
         Icon(
             imageVector = Icons.Default.Scale,
-            contentDescription = "Logo",
+            contentDescription = null,
             tint = AccentGold,
-            modifier = Modifier.size(50.dp)
+            modifier = Modifier.size(72.dp)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "LawSphere AI",
+            text = "How can I help?",
             color = Color.White,
-            fontSize = 24.sp,
+            fontSize = 26.sp,
             fontWeight = FontWeight.Bold
         )
 
         Text(
-            text = "Your intelligent guide to the Bharatiya Nyaya Sanhita (BNS).",
+            text = "Search across BNS, BNSS, and Indian Acts instantly.",
             color = Color.Gray,
-            fontSize = 14.sp,
-            textAlign = TextAlign.Center
+            fontSize = 15.sp,
+            textAlign = TextAlign.Center,
+            lineHeight = 22.sp,
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         Text(
-            text = "Try asking:",
-            color = Color.Gray,
-            fontSize = 12.sp,
-            modifier = Modifier.align(Alignment.Start)
+            text = "SUGGESTED QUERIES",
+            color = AccentGold,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.Start).padding(bottom = 8.dp)
         )
-
-        Spacer(modifier = Modifier.height(8.dp))
 
         suggestions.forEach { suggestion ->
             OutlinedButton(
                 onClick = { onSuggestionClick(suggestion) },
-                shape = RoundedCornerShape(50),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = GlassSurface,
-                    contentColor = Color.White
+                    containerColor = GlassSurface.copy(alpha = 0.5f),
+                    contentColor = Color.White.copy(alpha = 0.9f)
                 ),
                 border = androidx.compose.foundation.BorderStroke(
                     1.dp,
@@ -216,47 +283,16 @@ fun EmptyChatState(onSuggestionClick: (String) -> Unit) {
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp)
+                    .padding(vertical = 4.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
             ) {
                 Text(
                     text = suggestion,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Normal
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.fillMaxWidth()
                 )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-    }
-}
-
-@Composable
-fun ChatBubble(message: ChatMessage) {
-    val isUser = message.isUser
-    val align = if (isUser) Alignment.End else Alignment.Start
-    val bgColor = if (isUser) AccentGold else GlassSurface
-    val textColor = if (isUser) Color.Black else Color.White
-
-    val bubbleShape = if (isUser)
-        RoundedCornerShape(20.dp, 20.dp, 0.dp, 20.dp)
-    else
-        RoundedCornerShape(20.dp, 20.dp, 20.dp, 0.dp)
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = align
-    ) {
-        Box(
-            modifier = Modifier
-                .widthIn(max = 320.dp)
-                .background(bgColor, bubbleShape)
-                .border(1.dp, Color.White.copy(alpha = 0.1f), bubbleShape)
-                .padding(16.dp)
-        ) {
-            if (isUser) {
-                Text(text = message.text, color = textColor, style = MaterialTheme.typography.bodyMedium)
-            } else {
-                MarkdownText(markdown = message.text, color = textColor, style = MaterialTheme.typography.bodyMedium)
             }
         }
     }
@@ -368,12 +404,12 @@ fun GlassTopBar(onDeleteClick: () -> Unit) {
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {
-//        Text(
-//            text = "LawSphere",
-//            color = Color.White,
-//            fontWeight = FontWeight.Bold,
-//            fontSize = 20.sp
-//        )
+        Text(
+            text = "LawSphere AI",
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp
+        )
 
         IconButton(
             onClick = onDeleteClick,

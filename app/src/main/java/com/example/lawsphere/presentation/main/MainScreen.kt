@@ -16,18 +16,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
+import com.example.lawsphere.domain.model.LawyerProfile
 import com.example.lawsphere.presentation.awareness.CitizenGuideScreen
 import com.example.lawsphere.presentation.awareness.MapsScreen
 import com.example.lawsphere.presentation.chat.AccentGold
 import com.example.lawsphere.presentation.chat.ChatScreen
 import com.example.lawsphere.presentation.community.CommunityScreen
+import com.example.lawsphere.presentation.community.PrivateChatScreen
 import com.example.lawsphere.presentation.dashboard.CaseDashboardScreen
 import com.example.lawsphere.presentation.drafting.DraftingScreen
 import com.example.lawsphere.presentation.explorer.CompareScreen
 import com.example.lawsphere.presentation.explorer.RoadmapScreen
 import com.example.lawsphere.presentation.explorer.SectionExplorerScreen
 
-// 🟢 FIX 1: Shortened Titles for better fit
 sealed class BottomNavItem(val title: String, val icon: ImageVector) {
     object Chat : BottomNavItem("Chat", Icons.Default.Chat)
     object Explorer : BottomNavItem("BNS", Icons.Default.Article)
@@ -69,6 +70,8 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
     var showRoadmap by remember { mutableStateOf(false) }
     var showCompare by remember { mutableStateOf(false) }
 
+    var chatLawyer by remember { mutableStateOf<LawyerProfile?>(null) }
+
     Scaffold(
         bottomBar = {
             NavigationBar(
@@ -76,7 +79,8 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
                 contentColor = AccentGold
             ) {
                 tabs.forEach { item ->
-                    val isSelected = currentTab == item && !showMap && !showRoadmap && !showCompare
+                    val isSelected = currentTab == item &&
+                            !showMap && !showRoadmap && !showCompare && (chatLawyer == null)
 
                     NavigationBarItem(
                         selected = isSelected,
@@ -85,9 +89,9 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
                             showMap = false
                             showRoadmap = false
                             showCompare = false
+                            chatLawyer = null
                         },
                         icon = { Icon(item.icon, contentDescription = item.title) },
-
                         label = {
                             if (isSelected) {
                                 Text(
@@ -114,17 +118,32 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
         Box(modifier = Modifier.padding(padding)) {
 
             when {
+                chatLawyer != null -> {
+                    PrivateChatScreen(
+                        otherUserId = chatLawyer!!.uid,
+                        otherUserName = chatLawyer!!.name,
+                        onBack = { chatLawyer = null }
+                    )
+                }
+
                 showCompare -> CompareScreen(onBack = { showCompare = false })
                 showMap -> MapsScreen(onBack = { showMap = false })
                 showRoadmap -> RoadmapScreen(onBack = { showRoadmap = false })
+
                 else -> {
                     when (currentTab) {
                         BottomNavItem.Chat -> ChatScreen(onLogout = onLogout)
+
                         BottomNavItem.Explorer -> SectionExplorerScreen(
                             onOpenRoadmap = { showRoadmap = true },
                             onOpenCompare = { showCompare = true }
                         )
-                        BottomNavItem.Community -> CommunityScreen(userRole = userRole)
+
+                        BottomNavItem.Community -> CommunityScreen(
+                            userRole = userRole,
+                            onLawyerSelected = { lawyer -> chatLawyer = lawyer }
+                        )
+
                         BottomNavItem.Drafting -> DraftingScreen()
                         BottomNavItem.Dashboard -> CaseDashboardScreen()
                         BottomNavItem.Guide -> CitizenGuideScreen(onOpenMap = { showMap = true })
