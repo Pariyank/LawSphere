@@ -15,6 +15,10 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+//    private const val BASE_URL = "http://10.0.2.2:3000/"
+     private const val BASE_URL = "http://10.150.127.156:3000/"
+    // private const val BASE_URL = "https://lawsphere-backend-xvr1.onrender.com/"
+
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
@@ -29,7 +33,7 @@ object AppModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://lawsphere-backend-xvr1.onrender.com/")
+            .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
