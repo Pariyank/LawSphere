@@ -31,7 +31,7 @@ import com.example.lawsphere.presentation.explorer.SectionExplorerScreen
 
 sealed class BottomNavItem(val title: String, val icon: ImageVector) {
     object Chat : BottomNavItem("Chat", Icons.Default.Chat)
-    object Explorer : BottomNavItem("BNS", Icons.Default.Article)
+    object Explorer : BottomNavItem("Library", Icons.Default.Article)
     object Community : BottomNavItem("Forum", Icons.Default.Groups)
     object Drafting : BottomNavItem("Draft", Icons.Default.Gavel)
     object Dashboard : BottomNavItem("Cases", Icons.Default.BusinessCenter)
@@ -92,6 +92,7 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
                             chatLawyer = null
                         },
                         icon = { Icon(item.icon, contentDescription = item.title) },
+
                         label = {
                             if (isSelected) {
                                 Text(
@@ -145,9 +146,13 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
                         )
 
                         BottomNavItem.Drafting -> DraftingScreen()
+
                         BottomNavItem.Dashboard -> CaseDashboardScreen()
+
                         BottomNavItem.Guide -> CitizenGuideScreen(onOpenMap = { showMap = true })
+
                         BottomNavItem.Profile -> ProfileScreen(onLogout = onLogout)
+
                     }
                 }
             }

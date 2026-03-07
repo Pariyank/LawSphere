@@ -1,153 +1,200 @@
 [
   {
-    "chapter": "VI",
-    "section": "103",
+    "chapter": "VI (BNS)",
+    "section": "BNS 103",
     "title": "Punishment for Murder",
     "description": "Whoever commits murder shall be punished with death or imprisonment for life, and shall also be liable to fine.",
     "cognizable": "Yes",
     "bailable": "No",
-    "punishment": "Death or Life Imprisonment + Fine",
-    "cases": [
-      "Bachan Singh v. State of Punjab (Rarest of Rare Doctrine)",
-      "K.M. Nanavati v. State of Maharashtra (Grave & Sudden Provocation)"
-    ]
+    "punishment": "Death or Imprisonment for Life + Fine",
+    "cases": ["Bachan Singh v. State of Punjab", "K.M. Nanavati v. State of Maharashtra"]
   },
   {
-    "chapter": "XVII",
-    "section": "303",
+    "chapter": "VI (BNS)",
+    "section": "BNS 103(2)",
+    "title": "Mob Lynching",
+    "description": "When a group of five or more persons acting in concert commits murder on the ground of race, caste, community, sex, or belief.",
+    "punishment": "Death or Imprisonment for Life + Fine",
+    "cases": ["Tehseen Poonawalla v. Union of India"]
+  },
+  {
+    "chapter": "V (BNS)",
+    "section": "BNS 64",
+    "title": "Punishment for Rape",
+    "description": "Sexual intercourse with a woman against her will or without her consent.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Rigorous Imprisonment (10 years to Life) + Fine",
+    "cases": ["Mukesh & Anr v. State for NCT of Delhi (Nirbhaya Case)"]
+  },
+  {
+    "chapter": "V (BNS)",
+    "section": "BNS 69",
+    "title": "Sexual Intercourse by Deceit",
+    "description": "Sexual intercourse by employing deceitful means (false promise of employment or marriage) without intention to fulfill it.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Imprisonment up to 10 years + Fine",
+    "cases": ["Anurag Soni v. State of Chhattisgarh"]
+  },
+  {
+    "chapter": "V (BNS)",
+    "section": "BNS 74",
+    "title": "Assault to Outrage Modesty",
+    "description": "Assault or criminal force to woman with intent to outrage her modesty.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "1 to 5 years + Fine",
+    "cases": ["Rupan Deol Bajaj v. KPS Gill"]
+  },
+  {
+    "chapter": "V (BNS)",
+    "section": "BNS 78",
+    "title": "Stalking",
+    "description": "Following a woman, contacting her despite disinterest, or monitoring her internet usage.",
+    "cognizable": "Yes",
+    "bailable": "Yes (First Offense)",
+    "punishment": "Up to 3 years + Fine",
+    "cases": []
+  },
+  {
+    "chapter": "V (BNS)",
+    "section": "BNS 80",
+    "title": "Dowry Death",
+    "description": "Death of a woman caused by burns/injury within 7 years of marriage due to dowry harassment.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Imprisonment not less than 7 years",
+    "cases": ["Satbir Singh v. State of Haryana"]
+  },
+  {
+    "chapter": "XVII (BNS)",
+    "section": "BNS 303",
     "title": "Theft",
-    "description": "Whoever, intending to take dishonestly any movable property out of the possession of any person without that person's consent, moves that property in order to such taking, is said to commit theft.",
+    "description": "Dishonestly taking any movable property out of the possession of any person without that person's consent.",
     "cognizable": "Yes",
     "bailable": "No",
-    "punishment": "Imprisonment up to 3 years or fine or both",
-    "cases": [
-      "Pyare Lal Bhargava v. State of Rajasthan",
-      "K.N. Mehra v. State of Rajasthan"
-    ]
+    "punishment": "Up to 3 years or Fine or Both",
+    "cases": ["K.N. Mehra v. State of Rajasthan"]
   },
   {
-    "chapter": "V",
-    "section": "69",
-    "title": "Sexual Intercourse by Deceitful Means",
-    "description": "Sexual intercourse by employing deceitful means or making false promise to marry.",
-    "cognizable": "Yes",
-    "bailable": "No",
-    "punishment": "Imprisonment up to 10 years + Fine",
-    "cases": [
-      "Anurag Soni v. State of Chhattisgarh",
-      "Deelip Singh v. State of Bihar"
-    ]
-  },
-  {
-    "chapter": "VI",
-    "section": "109",
-    "title": "Attempt to Murder",
-    "description": "Whoever does any act with such intention or knowledge, and under such circumstances that, if death were caused, would amount to murder, shall be punished.",
-    "cognizable": "Yes",
-    "bailable": "No",
-    "punishment": "Imprisonment up to 10 years or Life + Fine",
-    "cases": [
-      "Two held on charge of murder attempt – Pune scrap vendors case under BNS 109",
-      "3 arrested for abduction & attempt to murder – Bhamboli village extortion case"
-    ]
-  },
-  {
-    "chapter": "VI",
-    "section": "115",
-    "title": "Voluntarily Causing Hurt",
-    "description": "Whoever voluntarily causes hurt shall be punished.",
-    "cognizable": "Yes",
-    "bailable": "Yes",
-    "punishment": "Imprisonment up to 1 year or Fine or Both",
-    "cases": []
-  },
-  {
-    "chapter": "VII",
-    "section": "128",
-    "title": "Wrongful Restraint",
-    "description": "Whoever voluntarily obstructs any person so as to prevent that person from proceeding in any direction in which that person has a right to proceed commits wrongful restraint.",
-    "cognizable": "Yes",
-    "bailable": "Yes",
-    "punishment": "Imprisonment up to 1 month or Fine or Both",
-    "cases": []
-  },
-  {
-    "chapter": "XVIII",
-    "section": "316",
-    "title": "Criminal Breach of Trust",
-    "description": "Whoever, being entrusted with property or dominion over property, dishonestly misappropriates or converts it to own use commits criminal breach of trust.",
-    "cognizable": "Yes",
-    "bailable": "No",
-    "punishment": "Imprisonment up to 5 years + Fine",
-    "cases": [
-      "Case against supplier for duping firm of ₹8.3 lakh – Criminal breach & cheating charges"
-    ]
-  },
-  {
-    "chapter": "XVIII",
-    "section": "318",
-    "title": "Cheating",
-    "description": "Whoever, by deceiving any person, fraudulently or dishonestly induces delivery of property or consent, commits cheating.",
-    "cognizable": "Yes",
-    "bailable": "No",
-    "punishment": "Imprisonment up to 7 years + Fine",
-    "cases": [
-      "Woman books kin for cheating her of ₹25 lakh – Pune cheating case",
-      "Four family members booked for cheating Dighi resident of ₹13.5 lakh"
-    ]
-  },
-  {
-    "chapter": "XVIII",
-    "section": "319",
-    "title": "Cheating by Personation",
-    "description": "Whoever cheats by pretending to be some other person commits cheating by personation.",
-    "cognizable": "Yes",
-    "bailable": "No",
-    "punishment": "Imprisonment up to 5 years + Fine",
-    "cases": []
-  },
-  {
-    "chapter": "XVII",
-    "section": "305",
+    "chapter": "XVII (BNS)",
+    "section": "BNS 304",
     "title": "Snatching",
-    "description": "Whoever, intending to commit theft, suddenly or quickly seizes movable property from a person commits snatching.",
+    "description": "Theft is 'snatching' if the offender suddenly or quickly seizes or grabs property from a person.",
     "cognizable": "Yes",
     "bailable": "No",
-    "punishment": "Imprisonment up to 3 years + Fine",
+    "punishment": "Up to 3 years + Fine",
     "cases": []
   },
   {
-    "chapter": "XVII",
-    "section": "309",
-    "title": "Robbery",
-    "description": "Theft or extortion becomes robbery when committed by causing or attempting to cause death, hurt, or wrongful restraint.",
+    "chapter": "XVII (BNS)",
+    "section": "BNS 308",
+    "title": "Extortion",
+    "description": "Intentionally putting a person in fear of injury to deliver property.",
     "cognizable": "Yes",
     "bailable": "No",
-    "punishment": "Rigorous imprisonment up to 10 years + Fine",
-    "cases": [
-      "Uttarakhand first FIR under BNS included robbery charge at Haridwar railway area"
-    ]
-  },
-  {
-    "chapter": "XVIII",
-    "section": "312",
-    "title": "Attempt to Commit Robbery or Dacoity when Armed with Deadly Weapon",
-    "description": "Whoever attempts to commit robbery or dacoity while armed with a deadly weapon shall be punished.",
-    "cognizable": "Yes",
-    "bailable": "No",
-    "punishment": "Imprisonment up to 10 years + Fine",
+    "punishment": "Up to 7 years + Fine",
     "cases": []
   },
   {
-    "chapter": "VI",
-    "section": "105",
-    "title": "Culpable Homicide",
-    "description": "Whoever causes death with the intention of causing death or such bodily injury as is likely to cause death shall be punished.",
+    "chapter": "XVII (BNS)",
+    "section": "BNS 316",
+    "title": "Criminal Breach of Trust",
+    "description": "Dishonest misappropriation of property entrusted to someone.",
     "cognizable": "Yes",
     "bailable": "No",
-    "punishment": "Life Imprisonment or Death + Fine",
-    "cases": [
-      "Bombay High Court holds BNS predicate offences under PMLA include culpable homicide provisions"
-    ]
+    "punishment": "Up to 5 years + Fine",
+    "cases": []
+  },
+  {
+    "chapter": "XVII (BNS)",
+    "section": "BNS 318",
+    "title": "Cheating",
+    "description": "Deceiving a person to deliver property or consent to retain property.",
+    "cognizable": "Yes",
+    "bailable": "Yes",
+    "punishment": "Up to 3 years + Fine",
+    "cases": []
+  },
+  {
+    "chapter": "National Security",
+    "section": "BNS 111",
+    "title": "Organised Crime",
+    "description": "Kidnapping, robbery, vehicle theft, contract killing, etc., by a crime syndicate.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Death or Life Imprisonment (if death results)",
+    "cases": []
+  },
+  {
+    "chapter": "National Security",
+    "section": "BNS 113",
+    "title": "Terrorist Act",
+    "description": "Acts threatening the unity, integrity, sovereignty, or economic security of India.",
+    "cognizable": "Yes",
+    "bailable": "No",
+    "punishment": "Death or Life Imprisonment",
+    "cases": ["Ajmal Kasab v. State of Maharashtra"]
+  },
+  {
+    "chapter": "Public Order",
+    "section": "BNS 189",
+    "title": "Unlawful Assembly",
+    "description": "An assembly of 5 or more persons with a common illegal object.",
+    "cognizable": "Yes",
+    "bailable": "Yes",
+    "punishment": "Up to 6 months or Fine",
+    "cases": []
+  },
+  {
+    "chapter": "Public Order",
+    "section": "BNS 191",
+    "title": "Rioting",
+    "description": "Force or violence used by an unlawful assembly.",
+    "cognizable": "Yes",
+    "bailable": "Yes",
+    "punishment": "Up to 2 years or Fine",
+    "cases": []
+  },
+  {
+    "chapter": "MV Act",
+    "section": "MV 181",
+    "title": "Driving Without License",
+    "description": "Driving a motor vehicle without a valid license.",
+    "cognizable": "Yes",
+    "bailable": "Yes",
+    "punishment": "Fine ₹5,000",
+    "cases": []
+  },
+  {
+    "chapter": "MV Act",
+    "section": "MV 185",
+    "title": "Drunk Driving",
+    "description": "Driving under the influence of alcohol or drugs.",
+    "cognizable": "Yes",
+    "bailable": "Yes",
+    "punishment": "Fine ₹10,000 + Imprisonment up to 6 months",
+    "cases": ["Alister Anthony Pareira v. State of Maharashtra"]
+  },
+  {
+    "chapter": "MV Act",
+    "section": "MV 194D",
+    "title": "Driving Without Helmet",
+    "description": "Riding a motorcycle without wearing a protective headgear.",
+    "cognizable": "No",
+    "bailable": "Yes",
+    "punishment": "Fine ₹1,000 + License Disqualification for 3 months",
+    "cases": []
+  },
+  {
+    "chapter": "MV Act",
+    "section": "MV 184",
+    "title": "Dangerous Driving",
+    "description": "Driving at a speed or in a manner dangerous to the public (e.g., jumping red lights, using phone).",
+    "cognizable": "Yes",
+    "bailable": "Yes",
+    "punishment": "Fine min ₹1,000 up to ₹5,000",
+    "cases": []
   }
 ]

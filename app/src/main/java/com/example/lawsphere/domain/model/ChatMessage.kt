@@ -1,9 +1,14 @@
 package com.example.lawsphere.domain.model
 
+import com.google.firebase.firestore.PropertyName
+
 data class ChatMessage(
     val id: String = "",
     val text: String = "",
-    val isUser: Boolean = false,
+
+    @get:PropertyName("isUser") @set:PropertyName("isUser")
+    var isUser: Boolean = false,
+
     val sources: List<String> = emptyList(),
     val timestamp: Long = System.currentTimeMillis()
 )

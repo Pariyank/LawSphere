@@ -129,26 +129,21 @@ fun ChatScreen(
                         state = listState,
                         modifier = Modifier
                             .weight(1f)
-                            .padding(horizontal = 8.dp),
-                        contentPadding = PaddingValues(vertical = 16.dp)
+                            .padding(horizontal = 12.dp),
+                        contentPadding = PaddingValues(vertical = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(messages) { msg ->
                             ChatBubble(msg)
                         }
                         if (isLoading) {
                             item {
-                                Row(
-                                    modifier = Modifier.padding(start = 16.dp, top = 8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    CircularProgressIndicator(
-                                        color = AccentGold,
-                                        modifier = Modifier.size(16.dp),
-                                        strokeWidth = 2.dp
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Thinking...", color = Color.Gray, fontSize = 12.sp)
-                                }
+                                Text(
+                                    "Thinking...",
+                                    color = Color.Gray,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(start = 16.dp)
+                                )
                             }
                         }
                     }
@@ -162,57 +157,51 @@ fun ChatScreen(
 fun ChatBubble(message: ChatMessage) {
     val isUser = message.isUser
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 4.dp),
-        contentAlignment = if (isUser) Alignment.CenterEnd else Alignment.CenterStart
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
+        verticalAlignment = Alignment.Bottom
     ) {
-        Row(
-            verticalAlignment = Alignment.Bottom,
-            modifier = Modifier.widthIn(max = 320.dp)
-        ) {
-            if (!isUser) {
-                Box(
-                    modifier = Modifier
-                        .size(30.dp)
-                        .background(GlassSurface, CircleShape)
-                        .border(1.dp, AccentGold.copy(alpha = 0.3f), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Scale,
-                        contentDescription = "AI",
-                        tint = AccentGold,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-            }
-
-            Column(
+        if (!isUser) {
+            Box(
                 modifier = Modifier
-                    .clip(
-                        if (isUser) RoundedCornerShape(18.dp, 18.dp, 2.dp, 18.dp) // User: Sharp Bottom-Right
-                        else RoundedCornerShape(18.dp, 18.dp, 18.dp, 2.dp)        // AI: Sharp Bottom-Left
-                    )
-                    .background(if (isUser) AccentGold else GlassSurface) // Gold vs Dark Gray
-                    .padding(12.dp)
+                    .size(28.dp)
+                    .background(GlassSurface, CircleShape)
+                    .border(1.dp, AccentGold.copy(alpha = 0.5f), CircleShape),
+                contentAlignment = Alignment.Center
             ) {
-                if (isUser) {
-                    Text(
-                        text = message.text,
-                        color = Color.Black, // Black text on Gold
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                } else {
-                    MarkdownText(
-                        markdown = message.text,
-                        color = Color.White, // White text on Dark Gray
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.Scale,
+                    contentDescription = "AI",
+                    tint = AccentGold,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+
+        Column(
+            modifier = Modifier
+                .widthIn(max = 300.dp)
+                .clip(
+                    if (isUser) RoundedCornerShape(18.dp, 18.dp, 2.dp, 18.dp) // User: Tail Bottom-Right
+                    else RoundedCornerShape(18.dp, 18.dp, 18.dp, 2.dp)        // AI: Tail Bottom-Left
+                )
+                .background(if (isUser) AccentGold else GlassSurface)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+        ) {
+            if (isUser) {
+                Text(
+                    text = message.text,
+                    color = Color.Black,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            } else {
+                MarkdownText(
+                    markdown = message.text,
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     }
@@ -223,51 +212,23 @@ fun EmptyChatState(onSuggestionClick: (String) -> Unit) {
     val suggestions = listOf(
         "Bail procedure under BNSS?",
         "Punishment for Cyber Stalking?",
-        "Difference between Theft and Robbery?",
-        "Rights of an arrested person?"
+        "Difference between Theft and Robbery?"
     )
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
+        modifier = Modifier.fillMaxSize().padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = Icons.Default.Scale,
-            contentDescription = null,
-            tint = AccentGold,
-            modifier = Modifier.size(72.dp)
-        )
-
+        Icon(Icons.Default.Scale, null, tint = AccentGold, modifier = Modifier.size(72.dp))
         Spacer(modifier = Modifier.height(24.dp))
-
+        Text("How can I help?", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold)
         Text(
-            text = "How can I help?",
-            color = Color.White,
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold
+            "Search across BNS, BNSS, and Indian Acts instantly.",
+            color = Color.Gray, fontSize = 15.sp, textAlign = TextAlign.Center
         )
-
-        Text(
-            text = "Search across BNS, BNSS, and Indian Acts instantly.",
-            color = Color.Gray,
-            fontSize = 15.sp,
-            textAlign = TextAlign.Center,
-            lineHeight = 22.sp,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-
         Spacer(modifier = Modifier.height(40.dp))
-
-        Text(
-            text = "SUGGESTED QUERIES",
-            color = AccentGold,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.Start).padding(bottom = 8.dp)
-        )
+        Text("SUGGESTED QUERIES", color = AccentGold, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.align(Alignment.Start).padding(bottom = 8.dp))
 
         suggestions.forEach { suggestion ->
             OutlinedButton(
@@ -277,22 +238,11 @@ fun EmptyChatState(onSuggestionClick: (String) -> Unit) {
                     containerColor = GlassSurface.copy(alpha = 0.5f),
                     contentColor = Color.White.copy(alpha = 0.9f)
                 ),
-                border = androidx.compose.foundation.BorderStroke(
-                    1.dp,
-                    Color.Gray.copy(0.3f)
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray.copy(0.3f)),
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
             ) {
-                Text(
-                    text = suggestion,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Text(suggestion, fontSize = 14.sp, fontWeight = FontWeight.Normal, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth())
             }
         }
     }
@@ -306,36 +256,21 @@ fun ChatInput(
     onCameraClick: () -> Unit,
     enabled: Boolean
 ) {
-    val speechLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
+    val speechLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val data = result.data
-            val results = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-            val spokenText = results?.get(0)
-            if (!spokenText.isNullOrBlank()) {
-                onValueChange(spokenText)
-            }
+            val spokenText = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.get(0)
+            if (!spokenText.isNullOrBlank()) onValueChange(spokenText)
         }
     }
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(GlassDark)
-            .padding(16.dp),
+        modifier = Modifier.fillMaxWidth().background(GlassDark).padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(
-            onClick = onCameraClick,
-            modifier = Modifier.size(40.dp),
-            colors = IconButtonDefaults.iconButtonColors(contentColor = AccentGold)
-        ) {
-            Icon(Icons.Default.DocumentScanner, contentDescription = "Scan Doc")
+        IconButton(onClick = onCameraClick) {
+            Icon(Icons.Default.DocumentScanner, contentDescription = "Scan Doc", tint = AccentGold)
         }
-
         Spacer(modifier = Modifier.width(4.dp))
-
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
@@ -351,40 +286,19 @@ fun ChatInput(
                 unfocusedContainerColor = Color.Transparent
             ),
             shape = RoundedCornerShape(24.dp),
-            singleLine = true,
-            maxLines = 1
+            singleLine = true
         )
-
         Spacer(modifier = Modifier.width(8.dp))
-
         if (value.isBlank()) {
-            IconButton(
-                onClick = {
-                    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                        putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                        putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak your legal query...")
-                    }
-                    try {
-                        speechLauncher.launch(intent)
-                    } catch (e: Exception) {}
-                },
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = GlassSurface,
-                    contentColor = AccentGold
-                )
-            ) {
-                Icon(Icons.Default.Mic, contentDescription = "Speak")
+            IconButton(onClick = {
+                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                try { speechLauncher.launch(intent) } catch (e: Exception) {}
+            }) {
+                Icon(Icons.Default.Mic, contentDescription = "Speak", tint = AccentGold)
             }
         } else {
-            IconButton(
-                onClick = onSend,
-                enabled = enabled,
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = AccentGold,
-                    disabledContainerColor = Color.Gray.copy(0.5f)
-                )
-            ) {
-                Icon(Icons.Default.Send, contentDescription = "Send", tint = Color.Black)
+            IconButton(onClick = onSend, enabled = enabled) {
+                Icon(Icons.Default.Send, contentDescription = "Send", tint = AccentGold)
             }
         }
     }
@@ -396,25 +310,12 @@ fun GlassTopBar(onDeleteClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .height(60.dp)
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(Color.Black.copy(0.9f), Color.Transparent)
-                )
-            )
+            .background(Brush.verticalGradient(listOf(Color.Black.copy(0.9f), Color.Transparent)))
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "LawSphere AI",
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
-        )
-
-        IconButton(
-            onClick = onDeleteClick,
-            modifier = Modifier.align(Alignment.CenterEnd)
-        ) {
+        Text("LawSphere AI", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+        IconButton(onClick = onDeleteClick, modifier = Modifier.align(Alignment.CenterEnd)) {
             Icon(Icons.Default.Delete, contentDescription = "Clear History", tint = Color.Gray)
         }
     }

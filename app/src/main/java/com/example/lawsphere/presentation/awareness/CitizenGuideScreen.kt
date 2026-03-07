@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.Computer
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.LocalPolice
+import androidx.compose.material.icons.filled.NearMe
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Woman
 import androidx.compose.material3.*
@@ -44,62 +46,61 @@ data class GuideTopic(
 fun CitizenGuideScreen(
     onOpenMap: () -> Unit
 ) {
-
     val topics = listOf(
         GuideTopic(
             "Arrested by Police?",
             Icons.Default.LocalPolice,
             "Know your rights immediately upon arrest.",
             listOf(
-                "1. Ask for the grounds of arrest.",
-                "2. You have the right to remain silent.",
-                "3. Contact a lawyer or family member.",
-                "4. Cannot be held more than 24 hours without court order.",
-                "5. Women cannot be arrested after sunset (exceptions apply)."
+                "1. Ask for the grounds/reason of arrest (Section 50 CrPC/BNSS).",
+                "2. You have the right to remain silent to avoid self-incrimination.",
+                "3. Demand to contact a lawyer or a family member immediately.",
+                "4. Police CANNOT hold you for more than 24 hours without a Magistrate's order.",
+                "5. If you are a woman, you cannot be arrested after sunset and before sunrise."
             )
         ),
         GuideTopic(
             "Police Refuse FIR?",
             Icons.Default.Warning,
-            "Steps to take if FIR is denied.",
+            "Steps to take if the station officer denies you.",
             listOf(
-                "1. Note officer name & designation.",
-                "2. Write to Superintendent of Police.",
-                "3. File online complaint.",
-                "4. Approach Magistrate."
+                "1. Note down the name and designation of the officer refusing.",
+                "2. Send the substance of information in writing by post to the Superintendent of Police (SP).",
+                "3. File an online complaint on your state's police portal.",
+                "4. Approach the Magistrate under Section 156(3) BNSS/CrPC."
             )
         ),
         GuideTopic(
             "Domestic Violence?",
             Icons.Default.Woman,
-            "Immediate protection steps.",
+            "Immediate protection for women.",
             listOf(
-                "1. Call 100 or 1091.",
-                "2. File Domestic Incident Report.",
-                "3. Seek protection order.",
-                "4. Free legal aid available."
+                "1. Dial 100 (Police) or 1091 (Women Helpline).",
+                "2. File a 'Domestic Incident Report' (DIR) with the Protection Officer.",
+                "3. You can approach the Magistrate directly for Protection Orders.",
+                "4. You are entitled to free legal aid."
             )
         ),
         GuideTopic(
             "Cyber Crime / Fraud?",
             Icons.Default.Computer,
-            "Online fraud or harassment help.",
+            "Online banking fraud or harassment.",
             listOf(
-                "1. Call 1930 immediately.",
-                "2. Register complaint online.",
-                "3. Take screenshots as evidence.",
-                "4. Inform your bank quickly."
+                "1. Immediately call 1930 (National Cyber Crime Helpline).",
+                "2. Register a complaint at cybercrime.gov.in.",
+                "3. Take screenshots of chats/transactions as evidence.",
+                "4. Contact your bank to freeze the account immediately."
             )
         ),
         GuideTopic(
             "Road Accident?",
             Icons.Default.CarCrash,
-            "Good Samaritan protection.",
+            "Good Samaritan laws protect you.",
             listOf(
-                "1. Help victim without fear.",
-                "2. Take to nearest hospital.",
-                "3. Note vehicle number.",
-                "4. Call emergency services."
+                "1. Do not fear police harassment; Good Samaritans are protected by law.",
+                "2. Take the victim to the nearest hospital immediately.",
+                "3. Note down the vehicle number of the offender.",
+                "4. Call 100/108 for help."
             )
         )
     )
@@ -110,20 +111,30 @@ fun CitizenGuideScreen(
             .background(GlassDark)
             .padding(16.dp)
     ) {
-        Text("Legal Awareness", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-        Text("Practical guidance for every citizen.", color = Color.Gray, fontSize = 14.sp)
+        Text(
+            text = "Legal Awareness",
+            color = Color.White,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            "Practical guidance for every Indian citizen.",
+            color = Color.Gray,
+            fontSize = 14.sp
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-
+        // 🟢 NEW BUTTON: To Open Maps
         Button(
-            onClick = onOpenMap,
+            onClick = onOpenMap, // Triggers the callback
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Red.copy(0.8f))
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F)), // Red for Emergency feel
+            shape = RoundedCornerShape(12.dp)
         ) {
-            Icon(Icons.Default.LocalPolice, contentDescription = null, tint = Color.White)
+            Icon(Icons.Default.NearMe, contentDescription = null, tint = Color.White)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Find Help Nearby (Maps)", color = Color.White)
+            Text("Find Police / Courts Nearby", color = Color.White, fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -152,12 +163,14 @@ fun GuideCard(topic: GuideTopic) {
             .clickable { expanded = !expanded }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Box(
                     modifier = Modifier
                         .size(48.dp)
-                        .background(AccentGold.copy(0.2f), RoundedCornerShape(12.dp)),
+                        .background(AccentGold.copy(alpha = 0.2f), RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(topic.icon, contentDescription = null, tint = AccentGold)
@@ -166,8 +179,18 @@ fun GuideCard(topic: GuideTopic) {
                 Spacer(modifier = Modifier.width(16.dp))
 
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(topic.title, color = Color.White, fontWeight = FontWeight.Bold)
-                    Text(topic.shortDesc, color = Color.Gray, fontSize = 12.sp)
+                    Text(
+                        text = topic.title,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                    Text(
+                        text = topic.shortDesc,
+                        color = Color.Gray,
+                        fontSize = 12.sp,
+                        maxLines = if (expanded) 2 else 1
+                    )
                 }
 
                 Icon(
@@ -183,8 +206,34 @@ fun GuideCard(topic: GuideTopic) {
                 exit = shrinkVertically() + fadeOut()
             ) {
                 Column(modifier = Modifier.padding(top = 16.dp)) {
-                    topic.steps.forEach {
-                        Text(it, color = Color.White, modifier = Modifier.padding(vertical = 4.dp))
+                    Divider(color = Color.White.copy(0.1f))
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "STEPS TO TAKE:",
+                        color = AccentGold,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    topic.steps.forEach { step ->
+                        Row(modifier = Modifier.padding(bottom = 6.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(top = 6.dp)
+                                    .size(6.dp)
+                                    .background(Color.Gray, RoundedCornerShape(50))
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text = step,
+                                color = Color.White.copy(0.9f),
+                                fontSize = 14.sp,
+                                lineHeight = 20.sp
+                            )
+                        }
                     }
                 }
             }
