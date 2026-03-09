@@ -1,10 +1,13 @@
 package com.example.lawsphere.domain.model
 
+import com.google.firebase.firestore.DocumentId
+
 data class PrivateMessage(
-    val id: String = "",
+    @DocumentId val id: String = "",
     val senderId: String = "",
     val text: String = "",
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    val deletedBy: List<String> = emptyList()
 )
 
 data class InboxItem(

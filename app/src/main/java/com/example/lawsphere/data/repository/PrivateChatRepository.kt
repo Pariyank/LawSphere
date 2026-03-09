@@ -3,6 +3,7 @@ package com.example.lawsphere.data.repository
 import com.example.lawsphere.domain.model.InboxItem
 import com.example.lawsphere.domain.model.PrivateMessage
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
@@ -44,7 +45,7 @@ class PrivateChatRepository @Inject constructor() {
                     val timestamp = doc.getLong("timestamp") ?: 0L
 
                     InboxItem(doc.id, otherId, otherName, lastMessage, timestamp)
-                }?.sortedByDescending { it.timestamp } ?: emptyList() // Sort latest first
+                }?.sortedByDescending { it.timestamp } ?: emptyList()
 
                 trySend(items)
             }
@@ -63,7 +64,13 @@ class PrivateChatRepository @Inject constructor() {
                 close(error)
                 return@addSnapshotListener
             }
-            val msgs = snapshot?.toObjects(PrivateMessage::class.java) ?: emptyList()
+
+            val myId = currentUserId ?: ""
+
+            val msgs = snapshot?.toObjects(PrivateMessage::class.java)?.filter { msg ->
+                !msg.deletedBy.contains(myId)
+            } ?: emptyList()
+
             trySend(msgs)
         }
         awaitClose { listener.remove() }
@@ -82,8 +89,7 @@ class PrivateChatRepository @Inject constructor() {
             timestamp = System.currentTimeMillis()
         )
 
-        db.collection("private_chats").document(roomId)
-            .collection("messages").add(message).await()
+        db.collection("private_chats").document(roomId).collection("messages").add(message).await()
 
         val roomData = hashMapOf(
             "participants" to listOf(myId, otherUserId),
@@ -91,7 +97,27 @@ class PrivateChatRepository @Inject constructor() {
             "lastMessage" to text,
             "timestamp" to System.currentTimeMillis()
         )
-
         db.collection("private_chats").document(roomId).set(roomData, SetOptions.merge()).await()
+    }
+
+    suspend fun deleteForEveryone(chatRoomId: String, messageId: String) {
+        try {
+            db.collection("private_chats").document(chatRoomId)
+                .collection("messages").document(messageId)
+                .delete().await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    suspend fun deleteForMe(chatRoomId: String, messageId: String) {
+        try {
+            val myId = currentUserId ?: return
+            db.collection("private_chats").document(chatRoomId)
+                .collection("messages").document(messageId)
+                .update("deletedBy", FieldValue.arrayUnion(myId)).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }

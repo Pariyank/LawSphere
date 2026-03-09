@@ -33,7 +33,7 @@ import java.util.Locale
 fun CommunityScreen(
     userRole: String,
     viewModel: CommunityViewModel = hiltViewModel(),
-    onChatClick: (String, String) -> Unit // 🟢 Generic Callback: UID and Name
+    onChatClick: (String, String) -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(0) }
 
@@ -44,6 +44,10 @@ fun CommunityScreen(
     val inbox by viewModel.inbox.collectAsState()
     val posts by viewModel.posts.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.refreshData()
+    }
 
     Column(
         modifier = Modifier.fillMaxSize().background(GlassDark).padding(16.dp)

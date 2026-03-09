@@ -8,6 +8,7 @@ import com.example.lawsphere.domain.model.ForumPost
 import com.example.lawsphere.domain.model.InboxItem
 import com.example.lawsphere.domain.model.LawyerProfile
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -21,6 +22,7 @@ class CommunityViewModel @Inject constructor(
 
     private val _lawyers = MutableStateFlow<List<LawyerProfile>>(emptyList())
     val lawyers = _lawyers.asStateFlow()
+
     private val _inbox = MutableStateFlow<List<InboxItem>>(emptyList())
     val inbox = _inbox.asStateFlow()
 
@@ -30,30 +32,36 @@ class CommunityViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-    init {
-        loadAllData()
 
-        viewModelScope.launch {
-            privateChatRepository.getInbox().collect { items ->
-                _inbox.value = items
-            }
-        }
-    }
+    private var inboxJob: Job? = null
 
-    fun loadAllData() {
+    fun refreshData() {
+
+        _lawyers.value = emptyList()
+        _inbox.value = emptyList()
+        _posts.value = emptyList()
+
+        inboxJob?.cancel()
+
         viewModelScope.launch {
             _isLoading.value = true
             repository.getLawyers().onSuccess { _lawyers.value = it }
             repository.getPosts().onSuccess { _posts.value = it }
             _isLoading.value = false
         }
+
+        inboxJob = viewModelScope.launch {
+            privateChatRepository.getInbox().collect { items ->
+                _inbox.value = items
+            }
+        }
     }
 
     fun postQuestion(title: String, desc: String) {
-        viewModelScope.launch { repository.createPost(title, desc); loadAllData() }
+        viewModelScope.launch { repository.createPost(title, desc); refreshData() }
     }
 
     fun answerQuestion(postId: String, answer: String) {
-        viewModelScope.launch { repository.addAnswer(postId, answer); loadAllData() }
+        viewModelScope.launch { repository.addAnswer(postId, answer); refreshData() }
     }
 }

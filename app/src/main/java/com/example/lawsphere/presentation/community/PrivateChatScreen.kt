@@ -1,6 +1,8 @@
 package com.example.lawsphere.presentation.community
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,7 +15,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,6 +40,8 @@ fun PrivateChatScreen(
     var inputText by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
 
+    var messageToDelete by remember { mutableStateOf<PrivateMessage?>(null) }
+
     LaunchedEffect(otherUserId) {
         viewModel.loadMessages(otherUserId)
     }
@@ -44,6 +50,43 @@ fun PrivateChatScreen(
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.size - 1)
         }
+    }
+
+    if (messageToDelete != null) {
+        val isMyMsg = messageToDelete!!.senderId == viewModel.currentUserId
+
+        AlertDialog(
+            onDismissRequest = { messageToDelete = null },
+            containerColor = Color(0xFF1E1E1E),
+            title = { Text("Delete Message", color = Color.White, fontWeight = FontWeight.Bold) },
+            text = { Text("How would you like to delete this message?", color = Color.Gray) },
+            confirmButton = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    if (isMyMsg) {
+                        TextButton(onClick = {
+                            viewModel.deleteForEveryone(otherUserId, messageToDelete!!.id)
+                            messageToDelete = null
+                        }) {
+                            Text("Delete for everyone", color = Color.Red)
+                        }
+                    }
+
+                    TextButton(onClick = {
+                        viewModel.deleteForMe(otherUserId, messageToDelete!!.id)
+                        messageToDelete = null
+                    }) {
+                        Text("Delete for me", color = AccentGold)
+                    }
+
+                    TextButton(onClick = { messageToDelete = null }) {
+                        Text("Cancel", color = Color.Gray)
+                    }
+                }
+            }
+        )
     }
 
     Column(modifier = Modifier.fillMaxSize().background(GlassDark)) {
@@ -56,7 +99,7 @@ fun PrivateChatScreen(
             }
             Spacer(modifier = Modifier.width(8.dp))
             Column {
-                Text(otherUserName, color = Color.White, fontSize = 18.sp)
+                Text(otherUserName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 Text("Private Chat", color = AccentGold, fontSize = 12.sp)
             }
         }
@@ -69,7 +112,11 @@ fun PrivateChatScreen(
         ) {
             items(messages) { msg ->
                 val isMe = msg.senderId == viewModel.currentUserId
-                MessageBubble(msg, isMe)
+                MessageBubble(
+                    message = msg,
+                    isMe = isMe,
+                    onLongPress = { messageToDelete = msg }
+                )
             }
         }
 
@@ -103,28 +150,41 @@ fun PrivateChatScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageBubble(message: PrivateMessage, isMe: Boolean) {
+fun MessageBubble(
+    message: PrivateMessage,
+    isMe: Boolean,
+    onLongPress: () -> Unit
+) {
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = if (isMe) Alignment.CenterEnd else Alignment.CenterStart
     ) {
-        Card(
-            colors = CardDefaults.cardColors(containerColor = if (isMe) AccentGold else Color(0xFF333333)),
-            shape = if (isMe) RoundedCornerShape(16.dp, 16.dp, 2.dp, 16.dp) else RoundedCornerShape(16.dp, 16.dp, 16.dp, 2.dp),
-            modifier = Modifier.widthIn(max = 280.dp)
-        ) {
-            Column(modifier = Modifier.padding(12.dp)) {
-                Text(message.text, color = if (isMe) Color.Black else Color.White, fontSize = 15.sp)
-
-                val time = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date(message.timestamp))
-                Text(
-                    text = time,
-                    color = if (isMe) Color.Black.copy(0.6f) else Color.Gray,
-                    fontSize = 10.sp,
-                    modifier = Modifier.align(Alignment.End).padding(top = 4.dp)
+        Column(
+            modifier = Modifier
+                .widthIn(max = 280.dp)
+                .clip(
+                    if (isMe) RoundedCornerShape(16.dp, 16.dp, 2.dp, 16.dp)
+                    else RoundedCornerShape(16.dp, 16.dp, 16.dp, 2.dp)
                 )
-            }
+                .background(if (isMe) AccentGold else Color(0xFF333333))
+
+                .combinedClickable(
+                    onClick = {},
+                    onLongClick = onLongPress
+                )
+                .padding(12.dp)
+        ) {
+            Text(message.text, color = if (isMe) Color.Black else Color.White, fontSize = 15.sp)
+
+            val time = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date(message.timestamp))
+            Text(
+                text = time,
+                color = if (isMe) Color.Black.copy(0.6f) else Color.Gray,
+                fontSize = 10.sp,
+                modifier = Modifier.align(Alignment.End).padding(top = 4.dp)
+            )
         }
     }
 }

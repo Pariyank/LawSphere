@@ -10,6 +10,7 @@ import com.example.lawsphere.data.utils.AppPreferences
 import com.example.lawsphere.domain.model.ChatMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -31,13 +32,13 @@ class ChatViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-    init {
+    private var chatJob: Job? = null
 
-        loadChatHistory()
-    }
+    fun loadChatHistory() {
+        chatJob?.cancel()
+        _messages.value = emptyList()
 
-    private fun loadChatHistory() {
-        viewModelScope.launch {
+        chatJob = viewModelScope.launch {
             chatRepository.getChatHistory().collect { history ->
                 _messages.value = history
             }
@@ -46,36 +47,25 @@ class ChatViewModel @Inject constructor(
 
     fun sendMessage(query: String) {
         if (query.isBlank()) return
-
         val userMsg = ChatMessage(text = query, isUser = true)
 
         viewModelScope.launch {
-
             chatRepository.saveMessage(userMsg)
-
             _isLoading.value = true
             try {
-
                 val lang = if (AppPreferences.isHindiMode) "hindi" else "english"
-
                 val response = withContext(Dispatchers.IO) {
                     api.chatWithLawSphere(ChatRequest(query = query, language = lang))
                 }
 
-                val sourceList = response.retrievedSources?.map {
-                    "Source ${it.sourceNumber}"
-                } ?: emptyList()
-
                 val aiMsg = ChatMessage(
                     text = response.formattedAnswer ?: "No answer received.",
-                    isUser = false,
-                    sources = sourceList
+                    isUser = false
                 )
                 chatRepository.saveMessage(aiMsg)
 
             } catch (e: Exception) {
                 e.printStackTrace()
-
                 chatRepository.saveMessage(
                     ChatMessage(
                         text = "Error: ${e.localizedMessage ?: "Unknown Connection Error"}",

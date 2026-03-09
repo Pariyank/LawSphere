@@ -55,6 +55,10 @@ fun ChatScreen(
 
     val listState = rememberLazyListState()
 
+    LaunchedEffect(Unit) {
+        viewModel.loadChatHistory()
+    }
+
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.size - 1)
