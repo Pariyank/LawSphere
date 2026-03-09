@@ -16,7 +16,7 @@ import javax.inject.Singleton
 object AppModule {
 
 //    private const val BASE_URL = "http://10.0.2.2:3000/"
-     private const val BASE_URL = "http://10.150.127.156:3000/"
+     private const val BASE_URL = "http://10.165.41.156:3000/"
     // private const val BASE_URL = "https://lawsphere-backend-xvr1.onrender.com/"
 
     @Provides

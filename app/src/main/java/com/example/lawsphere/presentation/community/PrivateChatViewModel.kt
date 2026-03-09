@@ -29,11 +29,10 @@ class PrivateChatViewModel @Inject constructor(
         }
     }
 
-    fun sendMessage(otherUserId: String, text: String) {
+    fun sendMessage(otherUserId: String, otherUserName: String, text: String) {
         if (text.isBlank()) return
-        val roomId = repository.getChatRoomId(otherUserId)
         viewModelScope.launch {
-            repository.sendMessage(roomId, text)
+            repository.sendMessage(otherUserId, otherUserName, text)
         }
     }
 }

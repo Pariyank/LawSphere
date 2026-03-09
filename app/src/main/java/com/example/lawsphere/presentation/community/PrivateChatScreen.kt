@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -22,6 +21,9 @@ import com.example.lawsphere.domain.model.PrivateMessage
 import com.example.lawsphere.presentation.chat.AccentGold
 import com.example.lawsphere.presentation.chat.GlassDark
 import com.example.lawsphere.presentation.chat.GlassSurface
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun PrivateChatScreen(
@@ -34,7 +36,6 @@ fun PrivateChatScreen(
     var inputText by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
 
-
     LaunchedEffect(otherUserId) {
         viewModel.loadMessages(otherUserId)
     }
@@ -45,16 +46,9 @@ fun PrivateChatScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(GlassDark)
-    ) {
+    Column(modifier = Modifier.fillMaxSize().background(GlassDark)) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(GlassSurface)
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth().background(GlassSurface).padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
@@ -62,16 +56,14 @@ fun PrivateChatScreen(
             }
             Spacer(modifier = Modifier.width(8.dp))
             Column {
-                Text(otherUserName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                Text("Private Consultation", color = AccentGold, fontSize = 12.sp)
+                Text(otherUserName, color = Color.White, fontSize = 18.sp)
+                Text("Private Chat", color = AccentGold, fontSize = 12.sp)
             }
         }
 
         LazyColumn(
             state = listState,
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 12.dp),
+            modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
             contentPadding = PaddingValues(vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -82,22 +74,17 @@ fun PrivateChatScreen(
         }
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(GlassSurface)
-                .padding(12.dp),
+            modifier = Modifier.fillMaxWidth().background(GlassSurface).padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
                 value = inputText,
                 onValueChange = { inputText = it },
-                placeholder = { Text("Type message...", color = Color.Gray) },
+                placeholder = { Text("Message...", color = Color.Gray) },
                 modifier = Modifier.weight(1f),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    focusedBorderColor = AccentGold,
-                    unfocusedBorderColor = Color.Gray,
+                    focusedTextColor = Color.White, unfocusedTextColor = Color.White,
+                    focusedBorderColor = AccentGold, unfocusedBorderColor = Color.Gray,
                     cursorColor = AccentGold
                 ),
                 shape = RoundedCornerShape(24.dp)
@@ -105,7 +92,7 @@ fun PrivateChatScreen(
             Spacer(modifier = Modifier.width(8.dp))
             IconButton(
                 onClick = {
-                    viewModel.sendMessage(otherUserId, inputText)
+                    viewModel.sendMessage(otherUserId, otherUserName, inputText)
                     inputText = ""
                 },
                 colors = IconButtonDefaults.iconButtonColors(containerColor = AccentGold)
@@ -123,21 +110,21 @@ fun MessageBubble(message: PrivateMessage, isMe: Boolean) {
         contentAlignment = if (isMe) Alignment.CenterEnd else Alignment.CenterStart
     ) {
         Card(
-            colors = CardDefaults.cardColors(
-                containerColor = if (isMe) AccentGold else Color(0xFF333333)
-            ),
-            shape = if (isMe)
-                RoundedCornerShape(12.dp, 12.dp, 2.dp, 12.dp)
-            else
-                RoundedCornerShape(12.dp, 12.dp, 12.dp, 2.dp),
+            colors = CardDefaults.cardColors(containerColor = if (isMe) AccentGold else Color(0xFF333333)),
+            shape = if (isMe) RoundedCornerShape(16.dp, 16.dp, 2.dp, 16.dp) else RoundedCornerShape(16.dp, 16.dp, 16.dp, 2.dp),
             modifier = Modifier.widthIn(max = 280.dp)
         ) {
-            Text(
-                text = message.text,
-                color = if (isMe) Color.Black else Color.White,
-                modifier = Modifier.padding(12.dp),
-                fontSize = 15.sp
-            )
+            Column(modifier = Modifier.padding(12.dp)) {
+                Text(message.text, color = if (isMe) Color.Black else Color.White, fontSize = 15.sp)
+
+                val time = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date(message.timestamp))
+                Text(
+                    text = time,
+                    color = if (isMe) Color.Black.copy(0.6f) else Color.Gray,
+                    fontSize = 10.sp,
+                    modifier = Modifier.align(Alignment.End).padding(top = 4.dp)
+                )
+            }
         }
     }
 }

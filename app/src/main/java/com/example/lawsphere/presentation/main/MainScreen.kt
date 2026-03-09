@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
-import com.example.lawsphere.domain.model.LawyerProfile
 import com.example.lawsphere.presentation.awareness.CitizenGuideScreen
 import com.example.lawsphere.presentation.awareness.MapsScreen
 import com.example.lawsphere.presentation.chat.AccentGold
@@ -43,7 +42,7 @@ sealed class BottomNavItem(val title: String, val icon: ImageVector) {
 fun MainScreen(userRole: String, onLogout: () -> Unit) {
 
     val tabs = remember(userRole) {
-        if (userRole == "lawyer") {
+        if (userRole.equals("lawyer", ignoreCase = true)) {
             listOf(
                 BottomNavItem.Chat,
                 BottomNavItem.Explorer,
@@ -70,7 +69,8 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
     var showRoadmap by remember { mutableStateOf(false) }
     var showCompare by remember { mutableStateOf(false) }
 
-    var chatLawyer by remember { mutableStateOf<LawyerProfile?>(null) }
+    var activeChatId by remember { mutableStateOf<String?>(null) }
+    var activeChatName by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         bottomBar = {
@@ -80,7 +80,10 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
             ) {
                 tabs.forEach { item ->
                     val isSelected = currentTab == item &&
-                            !showMap && !showRoadmap && !showCompare && (chatLawyer == null)
+                            !showMap &&
+                            !showRoadmap &&
+                            !showCompare &&
+                            (activeChatId == null)
 
                     NavigationBarItem(
                         selected = isSelected,
@@ -89,10 +92,10 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
                             showMap = false
                             showRoadmap = false
                             showCompare = false
-                            chatLawyer = null
+                            activeChatId = null
+                            activeChatName = null
                         },
                         icon = { Icon(item.icon, contentDescription = item.title) },
-
                         label = {
                             if (isSelected) {
                                 Text(
@@ -119,40 +122,69 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
         Box(modifier = Modifier.padding(padding)) {
 
             when {
-                chatLawyer != null -> {
+                activeChatId != null && activeChatName != null -> {
                     PrivateChatScreen(
-                        otherUserId = chatLawyer!!.uid,
-                        otherUserName = chatLawyer!!.name,
-                        onBack = { chatLawyer = null }
+                        otherUserId = activeChatId!!,
+                        otherUserName = activeChatName!!,
+                        onBack = {
+                            activeChatId = null
+                            activeChatName = null
+                        }
                     )
                 }
 
-                showCompare -> CompareScreen(onBack = { showCompare = false })
-                showMap -> MapsScreen(onBack = { showMap = false })
-                showRoadmap -> RoadmapScreen(onBack = { showRoadmap = false })
+                showCompare -> {
+                    CompareScreen(
+                        onBack = { showCompare = false }
+                    )
+                }
+
+                showMap -> {
+                    MapsScreen(
+                        onBack = { showMap = false }
+                    )
+                }
+
+                showRoadmap -> {
+                    RoadmapScreen(
+                        onBack = { showRoadmap = false }
+                    )
+                }
 
                 else -> {
                     when (currentTab) {
-                        BottomNavItem.Chat -> ChatScreen(onLogout = onLogout)
 
-                        BottomNavItem.Explorer -> SectionExplorerScreen(
-                            onOpenRoadmap = { showRoadmap = true },
-                            onOpenCompare = { showCompare = true }
-                        )
+                        BottomNavItem.Chat ->
+                            ChatScreen(onLogout = onLogout)
 
-                        BottomNavItem.Community -> CommunityScreen(
-                            userRole = userRole,
-                            onLawyerSelected = { lawyer -> chatLawyer = lawyer }
-                        )
+                        BottomNavItem.Explorer ->
+                            SectionExplorerScreen(
+                                onOpenRoadmap = { showRoadmap = true },
+                                onOpenCompare = { showCompare = true }
+                            )
 
-                        BottomNavItem.Drafting -> DraftingScreen()
+                        BottomNavItem.Community ->
+                            CommunityScreen(
+                                userRole = userRole,
+                                onChatClick = { id, name ->
+                                    activeChatId = id
+                                    activeChatName = name
+                                }
+                            )
 
-                        BottomNavItem.Dashboard -> CaseDashboardScreen()
+                        BottomNavItem.Drafting ->
+                            DraftingScreen()
 
-                        BottomNavItem.Guide -> CitizenGuideScreen(onOpenMap = { showMap = true })
+                        BottomNavItem.Dashboard ->
+                            CaseDashboardScreen()
 
-                        BottomNavItem.Profile -> ProfileScreen(onLogout = onLogout)
+                        BottomNavItem.Guide ->
+                            CitizenGuideScreen(
+                                onOpenMap = { showMap = true }
+                            )
 
+                        BottomNavItem.Profile ->
+                            ProfileScreen(onLogout = onLogout)
                     }
                 }
             }
