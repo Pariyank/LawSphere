@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.lawsphere"
+    namespace = "com.lawsphere.app"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.lawsphere"
+        applicationId = "com.lawsphere.app"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -33,7 +33,6 @@ android {
         }
     }
 
-    // CRITICAL FIX: Hilt and newer Android versions require Java 17
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -46,7 +45,6 @@ android {
         compose = true
     }
 
-    // CRITICAL FIX: Match Compose Compiler 1.5.1 with Kotlin 1.9.0
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
