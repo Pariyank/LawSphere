@@ -6,21 +6,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Cloud
-import androidx.compose.material.icons.filled.CompareArrows
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Gavel
-import androidx.compose.material.icons.filled.School
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,6 +31,7 @@ import com.lawsphere.app.presentation.chat.AccentGold
 import com.lawsphere.app.presentation.chat.GlassDark
 import com.lawsphere.app.presentation.chat.GlassSurface
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SectionExplorerScreen(
     onOpenRoadmap: () -> Unit,
@@ -48,34 +40,71 @@ fun SectionExplorerScreen(
 ) {
     val sections by viewModel.sections.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-
-    var searchQuery by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf("All") }
     val focusManager = LocalFocusManager.current
 
-    val categories = listOf("All", "BNS", "Women", "Traffic", "National", "Corporate", "Cyber")
+    val indianActs = listOf(
+        "Bar Council of India Rule, 1975",
+        "Bharatiya Nagarik Suraksha Sanhita, 2023",
+        "Bharatiya Nyaya Sanhita, 2023",
+        "Bharatiya Sakshya Adhiniyam, 2023",
+        "Indian Contract Act, 1872",
+        "Insolvency & Bankruptcy Code, 2016",
+        "Interest Act, 1978",
+        "Representation of People Act, 1951",
+        "The Advocates Act, 1961",
+        "The Air (Prevention & Control of Pollution) Act, 1981",
+        "The Arbitration & Conciliation Act, 1996",
+        "The Arms Act, 1959",
+        "The Code of Civil Procedure, 1908",
+        "The Companies Act, 2013",
+        "The Competition Act, 2002",
+        "The Consumer Protection Act, 1986",
+        "The Consumer Protection Act, 2019",
+        "The Copyright Act, 1957",
+        "The Designs Act, 2000",
+        "The Dissolution of Muslim Marriage Act, 1939",
+        "The Divorce Act, 1869",
+        "The Employee's Compensation Act, 1923",
+        "The Environment Protection Act, 1986",
+        "The Factories Act, 1948",
+        "The Foreign Exchange Management Act, 1999",
+        "The Geographical Indication of Goods Act, 1999",
+        "The Guardians & Wards Act, 1890",
+        "The Hindu Adoption & Maintenance Act, 1956",
+        "The Hindu Marriage Act, 1955",
+        "The Hindu Succession Act, 1956",
+        "The Indian Christian Marriage Act, 1872",
+        "The Industrial Dispute Act, 1947",
+        "The Information Technology Act, 2000",
+        "The Insurance Act, 1938",
+        "The Limitation Act, 1963",
+        "The Minimum Wages Act, 1948",
+        "The Negotiable Instruments Act, 1881",
+        "The Parsi Marriage & Divorce Act, 1936",
+        "The Patents Act, 1970",
+        "The Payment of Wages Act, 1936",
+        "The Protection of Children from Sexual Offences Act, 2012 (POCSO)",
+        "The Reserve Bank of India Act, 1934",
+        "The Sale of Goods Act, 1930",
+        "The SARFAESI Act, 2019",
+        "The Special Marriage Act, 1954",
+        "The Special Relief Act, 1963",
+        "The Trade Union Act, 1926",
+        "The Trademark Act, 1999",
+        "The Transfer of Property Act, 1882",
+        "The Water (Prevention & Control of Pollution) Act, 1974",
+        "The Wildlife (Protection) Act, 1972"
+    ).sorted()
 
-    // Update filter safely via ViewModel
-    LaunchedEffect(searchQuery, selectedCategory) {
-        if (searchQuery.isEmpty()) {
-            viewModel.resetToLocal()
-            if (!isLoading) viewModel.filterSections(searchQuery, selectedCategory)
-        }
-    }
+    var expandedDropdown by remember { mutableStateOf(false) }
+    var selectedAct by remember { mutableStateOf("Bharatiya Nyaya Sanhita, 2023") } // Default Act
+    var sectionNumber by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(GlassDark)
-            .padding(16.dp)
-    ) {
-        // Header
+    Column(modifier = Modifier.fillMaxSize().background(GlassDark).padding(16.dp)) {
         Text("Legal Library", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-        Text("Explore Acts, Codes & Tools", color = Color.Gray, fontSize = 14.sp)
-
+        Text("Search Exact Statements Across 50+ Acts", color = Color.Gray, fontSize = 14.sp)
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Tools Row
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             ToolCard("Compare Laws", Icons.Default.CompareArrows, AccentGold, onOpenCompare, Modifier.weight(1f))
             ToolCard("Career Path", Icons.Default.School, Color(0xFF64B5F6), onOpenRoadmap, Modifier.weight(1f))
@@ -83,207 +112,54 @@ fun SectionExplorerScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Search Bar
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            placeholder = { Text("Search (e.g. 302, Theft)...", color = Color.Gray) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = AccentGold) },
-            trailingIcon = {
-                if (searchQuery.isNotEmpty()) {
-                    IconButton(onClick = {
-                        searchQuery = ""
-                        viewModel.resetToLocal()
-                    }) { Icon(Icons.Default.Close, contentDescription = "Clear", tint = Color.Gray) }
+        ExposedDropdownMenuBox(expanded = expandedDropdown, onExpandedChange = { expandedDropdown = !expandedDropdown }) {
+            OutlinedTextField(
+                value = selectedAct, onValueChange = {}, readOnly = true,
+                label = { Text("Select Act / Law", color = Color.Gray) },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedDropdown) },
+                modifier = Modifier.menuAnchor().fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = AccentGold, unfocusedBorderColor = Color.Gray, focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedContainerColor = GlassSurface, unfocusedContainerColor = GlassSurface),
+                shape = RoundedCornerShape(12.dp)
+            )
+            ExposedDropdownMenu(expanded = expandedDropdown, onDismissRequest = { expandedDropdown = false }, modifier = Modifier.background(GlassSurface).heightIn(max = 300.dp)) {
+                indianActs.forEach { act ->
+                    DropdownMenuItem(text = { Text(act, color = Color.White) }, onClick = { selectedAct = act; expandedDropdown = false; viewModel.clearResults() })
                 }
-            },
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = sectionNumber, onValueChange = { sectionNumber = it },
+            label = { Text("Section Number (e.g. 102, 302(1))", color = Color.Gray) },
             modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = AccentGold,
-                unfocusedBorderColor = Color.Gray,
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                cursorColor = AccentGold,
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent
-            ),
-            shape = RoundedCornerShape(12.dp),
-            singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = {
-                focusManager.clearFocus()
-                viewModel.performCloudSearch(searchQuery)
-            })
+            keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus(); viewModel.performExactSearch(selectedAct, sectionNumber) }),
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = AccentGold, unfocusedBorderColor = Color.Gray, focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent),
+            shape = RoundedCornerShape(12.dp), singleLine = true
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Filter Chips (Scrollable)
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(end = 16.dp)
+        Button(
+            onClick = { focusManager.clearFocus(); viewModel.performExactSearch(selectedAct, sectionNumber) },
+            modifier = Modifier.fillMaxWidth().height(50.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = AccentGold),
+            shape = RoundedCornerShape(12.dp)
         ) {
-            items(categories) { cat ->
-                val isSelected = selectedCategory == cat
-                FilterChip(
-                    selected = isSelected,
-                    onClick = { selectedCategory = cat },
-                    label = { Text(cat, color = if(isSelected) Color.Black else Color.White) },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = AccentGold,
-                        containerColor = GlassSurface
-                    ),
-                    border = FilterChipDefaults.filterChipBorder(
-                        enabled = true,
-                        selected = isSelected,
-                        borderColor = Color.Gray.copy(0.5f),
-                        selectedBorderColor = AccentGold
-                    )
-                )
-            }
+            Icon(Icons.Default.Search, contentDescription = null, tint = Color.Black)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Extract Exact Statement", color = Color.Black, fontWeight = FontWeight.Bold)
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Cloud Search Button
-        if (sections.isEmpty() && !isLoading && searchQuery.isNotEmpty()) {
-            Button(
-                onClick = { viewModel.performCloudSearch(searchQuery) },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = GlassSurface),
-                border = androidx.compose.foundation.BorderStroke(1.dp, AccentGold)
-            ) {
-                Icon(Icons.Default.Cloud, contentDescription = null, tint = AccentGold)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Search Server for '$searchQuery'", color = AccentGold)
-            }
-        }
+        Spacer(modifier = Modifier.height(20.dp))
 
         if (isLoading) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = AccentGold)
-            }
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = AccentGold) }
         } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(bottom = 80.dp)
-            ) {
-                items(sections) { section ->
-                    SectionCard(section)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun SectionCard(section: BnsSection) {
-    var expanded by remember { mutableStateOf(false) }
-
-    // 🟢 NULL SAFETY PREPARATION
-    // We prepare safe strings here to avoid crashing inside the UI
-    val rawSection = section.section ?: "N/A"
-    val safeSectionTitle = rawSection.replace("BNS", "").trim().take(10) // Limit length
-    val safeTitle = section.title ?: "Unknown Title"
-    val safeChapter = section.chapter ?: "General"
-    val safeDescription = section.description ?: "No description provided."
-    val safePunishment = section.punishment ?: "See Act for details."
-    val safeCognizable = section.cognizable ?: "-"
-    val safeBailable = section.bailable ?: "-"
-
-    Card(
-        colors = CardDefaults.cardColors(containerColor = GlassSurface),
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .animateContentSize()
-            .border(1.dp, Color.White.copy(0.05f), RoundedCornerShape(12.dp))
-            .clickable { expanded = !expanded }
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Header
-            Row(verticalAlignment = Alignment.Top) {
-                Surface(
-                    color = AccentGold,
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.padding(end = 12.dp, top = 2.dp)
-                ) {
-                    Text(
-                        text = "Sec $safeSectionTitle",
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = safeTitle,
-                        color = Color.White,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp
-                    )
-                    Text(
-                        text = "Chapter $safeChapter",
-                        color = Color.Gray,
-                        fontSize = 12.sp
-                    )
-                }
-                Icon(
-                    imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = null,
-                    tint = Color.Gray
-                )
-            }
-
-            // Expanded Details
-            if (expanded) {
-                Column(modifier = Modifier.padding(top = 16.dp)) {
-                    Divider(color = Color.White.copy(0.1f))
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text("DESCRIPTION", color = AccentGold, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-
-                    Text(
-                        text = safeDescription,
-                        color = Color.White.copy(0.9f),
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = 12.dp, top = 4.dp)
-                    )
-
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        LegalTag("Cognizable", safeCognizable)
-                        LegalTag("Bailable", safeBailable)
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Surface(color = Color.Red.copy(0.1f), shape = RoundedCornerShape(8.dp), modifier = Modifier.fillMaxWidth()) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            Text("PUNISHMENT", color = Color(0xFFFF6B6B), fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                            Text(
-                                text = safePunishment,
-                                color = Color.White,
-                                fontSize = 14.sp
-                            )
-                        }
-                    }
-
-                    // Case Laws (Safe Iteration)
-                    if (!section.cases.isNullOrEmpty()) {
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text("LANDMARK CASES", color = AccentGold, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                        section.cases.forEach { caseName ->
-                            Row(modifier = Modifier.padding(vertical = 4.dp)) {
-                                Icon(Icons.Default.Gavel, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(14.dp).padding(top = 2.dp))
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(caseName, color = Color.White.copy(0.8f), fontSize = 13.sp, fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
-                            }
-                        }
-                    }
-                }
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(bottom = 80.dp)) {
+                items(sections) { section -> SectionCard(section, selectedAct) }
             }
         }
     }
@@ -303,7 +179,51 @@ fun ToolCard(title: String, icon: ImageVector, color: Color, onClick: () -> Unit
 }
 
 @Composable
+fun SectionCard(section: BnsSection, actName: String) {
+    var expanded by remember { mutableStateOf(false) }
+    val safeSection = section.section ?: "N/A"
+    val safeTitle = section.title ?: "Unknown"
+    val safeDescription = section.description ?: "Not Found in Context"
+    val safePunishment = section.punishment ?: "N/A"
+    val safeCognizable = section.cognizable ?: "N/A"
+    val safeBailable = section.bailable ?: "N/A"
+
+    Card(colors = CardDefaults.cardColors(containerColor = GlassSurface), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().animateContentSize().border(1.dp, Color.White.copy(0.05f), RoundedCornerShape(12.dp)).clickable { expanded = !expanded }) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.Top) {
+                Surface(color = AccentGold, shape = RoundedCornerShape(8.dp), modifier = Modifier.padding(end = 12.dp, top = 2.dp)) {
+                    Text("Sec $safeSection", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = safeTitle, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                    Text(text = actName, color = Color.Gray, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+                Icon(imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore, contentDescription = null, tint = Color.Gray)
+            }
+            if (expanded) {
+                Column(modifier = Modifier.padding(top = 16.dp)) {
+                    Divider(color = Color.White.copy(0.1f)); Spacer(modifier = Modifier.height(12.dp))
+                    Text("EXACT STATEMENT", color = AccentGold, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Text(safeDescription, color = Color.White.copy(0.9f), fontSize = 14.sp, modifier = Modifier.padding(bottom = 12.dp, top = 4.dp))
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        LegalTag("Cognizable", safeCognizable)
+                        LegalTag("Bailable", safeBailable)
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Surface(color = Color.DarkGray, shape = RoundedCornerShape(8.dp), modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text("PUNISHMENT / PENALTY", color = Color.LightGray, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            Text(safePunishment, color = Color.White, fontSize = 14.sp)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun LegalTag(label: String, value: String) {
     val color = if (value.equals("Yes", true)) Color(0xFF4CAF50) else if (value.equals("No", true)) Color(0xFFFF5252) else Color.Gray
-    Column { Text(text = label, color = Color.Gray, fontSize = 11.sp); Text(text = value, color = color, fontSize = 14.sp, fontWeight = FontWeight.Bold) }
+    Column { Text(label, color = Color.Gray, fontSize = 11.sp); Text(value, color = color, fontSize = 14.sp, fontWeight = FontWeight.Bold) }
 }

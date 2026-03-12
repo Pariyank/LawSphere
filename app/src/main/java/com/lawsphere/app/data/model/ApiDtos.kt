@@ -21,3 +21,8 @@ data class ChatResponse(
     val semanticTags: List<String>? = emptyList(),
     val retrievedSources: List<RetrievedSource>? = emptyList()
 )
+
+data class LookupRequest(
+    val act: String,
+    val section: String
+)
