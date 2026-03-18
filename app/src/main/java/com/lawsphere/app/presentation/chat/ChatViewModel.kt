@@ -85,21 +85,17 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun compareSections(section1: String, section2: String) {
-        if (section1.isBlank() || section2.isBlank()) return
+    fun compareSections(act1: String, sec1: String, act2: String, sec2: String) {
         _comparisonResult.value = null
-
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 val response = withContext(Dispatchers.IO) {
-                    api.compareSections(CompareRequest(section1, section2))
+                    api.compareSections(CompareRequest(act1, sec1, act2, sec2))
                 }
-                _comparisonResult.value = response.formattedAnswer ?: "Comparison failed."
-
+                _comparisonResult.value = response.formattedAnswer
             } catch (e: Exception) {
-                e.printStackTrace()
-                _comparisonResult.value = "Comparison Error: ${e.localizedMessage}"
+                _comparisonResult.value = "Error connecting to server."
             }
             _isLoading.value = false
         }

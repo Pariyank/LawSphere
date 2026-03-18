@@ -1,9 +1,15 @@
 package com.lawsphere.app.data.model
 
 data class ChatRequest(val query: String, val language: String = "english")
-data class CompareRequest(val section1: String, val section2: String)
-data class LookupRequest(val act: String, val section: String)
 
+data class CompareRequest(
+    val act1: String,
+    val sec1: String,
+    val act2: String,
+    val sec2: String
+)
+
+data class LookupRequest(val act: String, val section: String)
 data class RetrievedSource(val sourceNumber: Int = 0, val snippet: String = "")
 
 data class ChatResponse(
