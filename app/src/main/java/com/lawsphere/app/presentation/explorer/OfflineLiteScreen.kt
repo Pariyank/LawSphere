@@ -43,7 +43,11 @@ fun OfflineLiteScreen(onBack: () -> Unit) {
     var selectedCategory by remember { mutableStateOf("All") }
     val categories = listOf("All", "Arrest", "Women", "Traffic", "General")
 
-    val filteredList = if (selectedCategory == "All") offlineSections else offlineSections.filter { it.category == selectedCategory }
+    val filteredList = if (selectedCategory == "All") {
+        offlineSections
+    } else {
+        offlineSections.filter { it.category == selectedCategory }
+    }
 
     Column(
         modifier = Modifier
@@ -110,15 +114,16 @@ fun OfflineCard(section: BnsSection) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Bolt, contentDescription = null, tint = AccentGold, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
+
                 Text(
-                    text = section.section,
+                    text = section.section ?: "N/A",
                     color = AccentGold,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = section.category.uppercase(),
+                    text = (section.category ?: "General").uppercase(),
                     color = Color.Gray,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold
@@ -128,14 +133,14 @@ fun OfflineCard(section: BnsSection) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = section.title,
+                text = section.title ?: "Unknown Title",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
 
             Text(
-                text = section.description,
+                text = section.description ?: "No description available.",
                 color = Color.White.copy(0.8f),
                 fontSize = 14.sp,
                 modifier = Modifier.padding(vertical = 8.dp)
@@ -146,8 +151,9 @@ fun OfflineCard(section: BnsSection) {
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
+
                 Text(
-                    text = "Penalty: ${section.punishment}",
+                    text = "Penalty: ${section.punishment ?: "Refer to Act"}",
                     color = Color(0xFFFF6B6B),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,

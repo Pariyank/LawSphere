@@ -21,4 +21,19 @@ object JsonParser {
         val listType = object : TypeToken<List<BnsSection>>() {}.type
         return Gson().fromJson(jsonString, listType)
     }
+
+    fun loadActList(context: Context): List<String> {
+        val jsonString: String
+        try {
+            jsonString = context.assets.open("legal_acts.json")
+                .bufferedReader()
+                .use { it.readText() }
+        } catch (ioException: IOException) {
+            return emptyList()
+        }
+
+        val mapType = object : TypeToken<Map<String, List<String>>>() {}.type
+        val data: Map<String, List<String>> = Gson().fromJson(jsonString, mapType)
+        return data["acts"] ?: emptyList()
+    }
 }

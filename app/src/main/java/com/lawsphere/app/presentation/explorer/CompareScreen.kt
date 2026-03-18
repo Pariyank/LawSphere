@@ -96,7 +96,6 @@ fun CompareScreen(
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = AccentGold),
-            enabled = !isLoading && sectionA.isNotEmpty() && sectionB.isNotEmpty()
         ) {
             if (isLoading) {
                 CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.Black)
