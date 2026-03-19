@@ -105,4 +105,9 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
     implementation("com.google.android.gms:play-services-auth:20.7.0")
+
+    implementation("com.google.ai.client.generativeai:generativeai:0.7.0")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
+
+    implementation("com.google.firebase:firebase-messaging-ktx")
 }

@@ -2,6 +2,7 @@ package com.lawsphere.app.presentation.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.ai.client.generativeai.GenerativeModel
 import com.lawsphere.app.data.api.LawApi
 import com.lawsphere.app.data.model.ChatRequest
 import com.lawsphere.app.data.model.CompareRequest
@@ -20,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val api: LawApi,
-    private val chatRepository: ChatRepository
+    private val chatRepository: ChatRepository,
+    val generativeModel: GenerativeModel
 ) : ViewModel() {
 
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())

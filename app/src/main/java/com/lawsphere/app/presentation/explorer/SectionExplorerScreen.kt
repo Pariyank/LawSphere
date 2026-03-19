@@ -1,15 +1,15 @@
 package com.lawsphere.app.presentation.explorer
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed // 🟢 Changed to itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -17,11 +17,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,21 +48,10 @@ fun SectionExplorerScreen(
     var secNum by remember { mutableStateOf("") }
 
     LaunchedEffect(availableActs) {
-        if (availableActs.isNotEmpty() && selectedAct.isEmpty()) {
-            selectedAct = availableActs[0]
-        }
+        if (availableActs.isNotEmpty() && selectedAct.isEmpty()) selectedAct = availableActs[0]
     }
 
-    val sheetState = rememberModalBottomSheetState()
-
-    // 🟢 USING LAZYCOLUMN FOR THE ENTIRE SCREEN TO PREVENT BUTTON HIDING
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(GlassDark),
-        contentPadding = PaddingValues(16.dp)
-    ) {
-        // 1. Header
+    LazyColumn(modifier = Modifier.fillMaxSize().background(GlassDark), contentPadding = PaddingValues(16.dp)) {
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.MenuBook, null, tint = AccentGold, modifier = Modifier.size(28.dp))
@@ -72,7 +61,6 @@ fun SectionExplorerScreen(
             Spacer(modifier = Modifier.height(20.dp))
         }
 
-        // 2. Tool Cards
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 ToolCard("Compare", Icons.Default.CompareArrows, AccentGold, onOpenCompare, Modifier.weight(1f))
@@ -81,100 +69,56 @@ fun SectionExplorerScreen(
             Spacer(modifier = Modifier.height(32.dp))
         }
 
-        // 3. Act Selector
         item {
             Text("SELECT ACT / LAW", color = AccentGold, fontSize = 11.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(GlassSurface, RoundedCornerShape(12.dp))
-                    .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
-                    .clickable { if (availableActs.isNotEmpty()) showPicker = true }
-                    .padding(16.dp)
-            ) {
+            Box(modifier = Modifier.fillMaxWidth().background(GlassSurface, RoundedCornerShape(12.dp)).border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(12.dp)).clickable { if (availableActs.isNotEmpty()) showPicker = true }.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Gavel, null, tint = Color.Gray, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        text = if (selectedAct.isEmpty()) "Loading Acts..." else selectedAct,
-                        color = Color.White, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Icon(Icons.Default.UnfoldMore, null, tint = AccentGold)
+                    Text(text = if (selectedAct.isEmpty()) "Loading..." else selectedAct, color = Color.White, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                    Icon(Icons.Default.ArrowDropDown, null, tint = AccentGold)
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // 4. Section Input
         item {
-            OutlinedTextField(
-                value = secNum, onValueChange = { secNum = it },
-                placeholder = { Text("Section/Article Number", color = Color.Gray) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = {
-                    focusManager.clearFocus()
-                    viewModel.performExactSearch(selectedAct, secNum)
-                }),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.White, unfocusedTextColor = Color.White,
-                    focusedBorderColor = AccentGold, unfocusedBorderColor = Color.White.copy(0.1f)
-                )
-            )
+            OutlinedTextField(value = secNum, onValueChange = { secNum = it }, placeholder = { Text("Section Number", color = Color.Gray) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = AccentGold))
             Spacer(modifier = Modifier.height(20.dp))
         }
 
-        // 5. SEARCH BUTTON
         item {
-            Button(
-                onClick = {
-                    focusManager.clearFocus()
-                    viewModel.performExactSearch(selectedAct, secNum)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(54.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = AccentGold),
-                shape = RoundedCornerShape(12.dp)
-            ) {
+            Button(onClick = { focusManager.clearFocus(); viewModel.performExactSearch(selectedAct, secNum) }, modifier = Modifier.fillMaxWidth().height(54.dp), colors = ButtonDefaults.buttonColors(containerColor = AccentGold), shape = RoundedCornerShape(12.dp), enabled = !isLoading && secNum.isNotBlank()) {
                 Text("SEARCH DATABASE", color = Color.Black, fontWeight = FontWeight.Bold)
             }
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        // 6. LOADING OR RESULTS
         if (isLoading) {
-            item {
-                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = AccentGold)
-                }
-            }
+            item { Box(Modifier.fillMaxWidth(), Alignment.Center) { CircularProgressIndicator(color = AccentGold) } }
         } else {
-            items(sections) { ResultCard(it) }
-        }
+            itemsIndexed(sections) { index, section ->
+                var visible by remember { mutableStateOf(false) }
+                LaunchedEffect(Unit) { visible = true }
 
-        // Add extra padding at the bottom so the last card isn't covered by the bottom nav
-        item { Spacer(modifier = Modifier.height(80.dp)) }
+                AnimatedVisibility(
+                    visible = visible,
+                    enter = slideInVertically(animationSpec = tween(400, delayMillis = index * 100)) + fadeIn()
+                ) {
+                    ResultCard(section)
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        }
     }
 
-    // BOTTOM SHEET PICKER (Remains same)
     if (showPicker) {
-        ModalBottomSheet(
-            onDismissRequest = { showPicker = false },
-            sheetState = sheetState,
-            containerColor = Color(0xFF1A1A1A)
-        ) {
-            ActPickerContent(
-                allActs = availableActs,
-                onSelect = { selectedAct = it; showPicker = false; viewModel.clearResults() }
-            )
+        ModalBottomSheet(onDismissRequest = { showPicker = false }, containerColor = Color(0xFF1A1A1A)) {
+            ActPickerContent(allActs = availableActs, onSelect = { selectedAct = it; showPicker = false; viewModel.clearResults() })
         }
     }
 }
-
 @Composable
 fun ActPickerContent(allActs: List<String>, onSelect: (String) -> Unit) {
     var searchQuery by remember { mutableStateOf("") }
@@ -186,7 +130,6 @@ fun ActPickerContent(allActs: List<String>, onSelect: (String) -> Unit) {
         Text("Browse Acts", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Search inside picker
         TextField(
             value = searchQuery,
             onValueChange = { searchQuery = it; limit = 20 },
@@ -212,7 +155,6 @@ fun ActPickerContent(allActs: List<String>, onSelect: (String) -> Unit) {
                 Divider(color = Color.White.copy(0.05f))
             }
 
-            // 🟢 SEE MORE LOGIC
             if (filtered.size > limit) {
                 item {
                     TextButton(

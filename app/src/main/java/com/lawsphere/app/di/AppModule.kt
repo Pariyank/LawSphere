@@ -1,5 +1,6 @@
 package com.lawsphere.app.di
 
+import com.google.ai.client.generativeai.GenerativeModel
 import com.lawsphere.app.data.api.LawApi
 import dagger.Module
 import dagger.Provides
@@ -43,5 +44,14 @@ object AppModule {
     @Singleton
     fun provideLawApi(retrofit: Retrofit): LawApi {
         return retrofit.create(LawApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGeminiModel(): GenerativeModel {
+        return GenerativeModel(
+            modelName = "gemini-2.5-flash",
+            apiKey = "AIzaSyCBeph2v44ASUf6ivIt7sn07zbwRcl1VFA"
+        )
     }
 }
