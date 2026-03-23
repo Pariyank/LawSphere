@@ -165,7 +165,7 @@ fun ProfileScreen(onLogout: () -> Unit) {
                                 isHindiMode = it
                                 AppPreferences.isHindiMode = it
                             },
-                            colors = SwitchDefaults.colors(checkedThumbColor = AccentGold)
+                            colors = SwitchDefaults.colors(AccentGold)
                         )
                     }
                 }

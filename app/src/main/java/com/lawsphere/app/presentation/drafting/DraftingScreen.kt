@@ -1,5 +1,8 @@
 package com.lawsphere.app.presentation.drafting
 
+import android.widget.Toast
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,120 +11,191 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Assignment
-import androidx.compose.material.icons.filled.Gavel
-import androidx.compose.material.icons.filled.Mail
-import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.lawsphere.app.data.utils.FileDownloader
 import com.lawsphere.app.data.utils.PdfGenerator
 import com.lawsphere.app.domain.model.DraftingTemplate
+import com.lawsphere.app.domain.model.LegalForm
 import com.lawsphere.app.presentation.chat.AccentGold
 import com.lawsphere.app.presentation.chat.GlassDark
 import com.lawsphere.app.presentation.chat.GlassSurface
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
-@Composable
-fun DraftingScreen() {
-    var selectedTemplate by remember { mutableStateOf<DraftingTemplate?>(null) }
-
-    if (selectedTemplate == null) {
-        TemplateSelectionList(onSelect = { selectedTemplate = it })
-    } else {
-        DraftingForm(
-            template = selectedTemplate!!,
-            onBack = { selectedTemplate = null }
-        )
-    }
+// 🟢 Simplified View States
+enum class DraftingView {
+    DASHBOARD, AI_CUSTOM_DRAFT, BNSS_FORMS_GALLERY
 }
 
 @Composable
-fun TemplateSelectionList(onSelect: (DraftingTemplate) -> Unit) {
-    val templates = listOf(
-        DraftingTemplate.FIR,
-        DraftingTemplate.Bail,
-        DraftingTemplate.Notice
-    )
+fun DraftingScreen() {
+    var currentView by remember { mutableStateOf(DraftingView.DASHBOARD) }
+    var selectedTemplate by remember { mutableStateOf<DraftingTemplate?>(null) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(GlassDark)
-            .padding(16.dp)
-    ) {
-        Text(
-            "Legal Drafting Tools",
-            color = Color.White,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            "Select a document to generate",
-            color = Color.Gray,
-            fontSize = 14.sp
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(templates) { template ->
-                TemplateCard(template, onSelect)
+    Surface(modifier = Modifier.fillMaxSize(), color = GlassDark) {
+        AnimatedContent(
+            targetState = currentView,
+            transitionSpec = { fadeIn(tween(400)) togetherWith fadeOut(tween(400)) },
+            label = "ScreenTransition"
+        ) { targetView ->
+            when (targetView) {
+                DraftingView.DASHBOARD -> {
+                    DraftingDashboard(
+                        onSelectAI = { template ->
+                            selectedTemplate = template
+                            currentView = DraftingView.AI_CUSTOM_DRAFT
+                        },
+                        onSelectGallery = { currentView = DraftingView.BNSS_FORMS_GALLERY }
+                    )
+                }
+                DraftingView.AI_CUSTOM_DRAFT -> {
+                    selectedTemplate?.let {
+                        DraftingForm(template = it, onBack = { currentView = DraftingView.DASHBOARD })
+                    }
+                }
+                DraftingView.BNSS_FORMS_GALLERY -> {
+                    BNSSFormsGalleryContent(onBack = { currentView = DraftingView.DASHBOARD })
+                }
             }
         }
     }
 }
 
 @Composable
-fun TemplateCard(template: DraftingTemplate, onClick: (DraftingTemplate) -> Unit) {
-    val icon = when (template) {
-        DraftingTemplate.FIR -> Icons.Default.Assignment
-        DraftingTemplate.Bail -> Icons.Default.Gavel
-        DraftingTemplate.Notice -> Icons.Default.Mail
-        else -> Icons.Default.Assignment
-    }
+fun DraftingDashboard(onSelectAI: (DraftingTemplate) -> Unit, onSelectGallery: () -> Unit) {
+    val aiTemplates = listOf(DraftingTemplate.FIR, DraftingTemplate.Bail, DraftingTemplate.Notice)
 
-    val displayTitle = when(template) {
-        DraftingTemplate.FIR -> "Police Complaint / FIR"
-        else -> template.title
-    }
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text("Drafting Suite", color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+        Text("Create custom documents or download official forms", color = Color.Gray, fontSize = 14.sp)
 
-    Card(
-        colors = CardDefaults.cardColors(containerColor = GlassSurface),
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier
-            .height(140.dp)
-            .clickable { onClick(template) }
-            .border(1.dp, Color.White.copy(0.1f), RoundedCornerShape(16.dp))
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth().height(110.dp).clickable { onSelectGallery() },
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = GlassSurface),
+            border = androidx.compose.foundation.BorderStroke(1.dp, AccentGold)
         ) {
-            Icon(icon, contentDescription = null, tint = AccentGold, modifier = Modifier.size(40.dp))
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = displayTitle,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 8.dp),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-            )
+            Row(modifier = Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
+                Box(modifier = Modifier.size(50.dp).background(AccentGold.copy(alpha = 0.1f), CircleShape), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Default.AutoAwesomeMotion, null, tint = AccentGold)
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Column {
+                    Text("BNSS Form Library", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text("Download official Second Schedule forms", color = Color.Gray, fontSize = 12.sp)
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+        Text("AI QUICK DRAFTS", color = AccentGold, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(12.dp))
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(aiTemplates) { template ->
+                Card(
+                    modifier = Modifier.height(140.dp).clickable { onSelectAI(template) },
+                    colors = CardDefaults.cardColors(containerColor = GlassSurface),
+                    shape = RoundedCornerShape(20.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
+                ) {
+                    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Default.Assignment, null, tint = AccentGold, modifier = Modifier.size(32.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(template.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, textAlign = TextAlign.Center)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun BNSSFormsGalleryContent(onBack: () -> Unit) {
+    val context = LocalContext.current
+    var searchQuery by remember { mutableStateOf("") }
+
+    val allForms = remember {
+        try {
+            val json = context.assets.open("bnss_forms.json").bufferedReader().use { it.readText() }
+            val type = object : TypeToken<Map<String, List<LegalForm>>>() {}.type
+            val data: Map<String, List<LegalForm>> = Gson().fromJson(json, type)
+            data["forms"] ?: emptyList()
+        } catch (e: Exception) { emptyList() }
+    }
+
+    val filtered = allForms.filter { it.title.contains(searchQuery, true) }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, null, tint = Color.White) }
+            Text("Official BNSS Forms", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = searchQuery, onValueChange = { searchQuery = it },
+            placeholder = { Text("Search form name...", color = Color.Gray) },
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = { Icon(Icons.Default.Search, null, tint = AccentGold) },
+            shape = RoundedCornerShape(16.dp),
+            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = AccentGold)
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            itemsIndexed(filtered) { index, form ->
+                var isVisible by remember { mutableStateOf(false) }
+                LaunchedEffect(Unit) { isVisible = true }
+
+                AnimatedVisibility(visible = isVisible, enter = slideInHorizontally(tween(400, index * 30)) + fadeIn()) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = GlassSurface),
+                        shape = RoundedCornerShape(16.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(0.05f))
+                    ) {
+                        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("FORM ${form.id}", color = AccentGold, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                Text(form.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(form.description, color = Color.Gray, fontSize = 12.sp, maxLines = 1)
+                            }
+                            IconButton(
+                                onClick = { FileDownloader.downloadPdf(context, form.storage_url, form.title) },
+                                modifier = Modifier.background(AccentGold, RoundedCornerShape(12.dp)).size(44.dp)
+                            ) {
+                                Icon(Icons.Default.FileDownload, null, tint = Color.Black)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -129,161 +203,52 @@ fun TemplateCard(template: DraftingTemplate, onClick: (DraftingTemplate) -> Unit
 @Composable
 fun DraftingForm(template: DraftingTemplate, onBack: () -> Unit) {
     val context = LocalContext.current
-    val currentDate = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault()).format(Date())
-
-    var senderName by remember { mutableStateOf("") }
-    var recipientName by remember { mutableStateOf("") }
+    val date = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault()).format(Date())
+    var sender by remember { mutableStateOf("") }
+    var recipient by remember { mutableStateOf("") }
     var details by remember { mutableStateOf("") }
 
-
-    val titleText = when(template) {
-        DraftingTemplate.FIR -> "Police Complaint"
-        else -> template.title
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(GlassDark)
-            .padding(16.dp)
-    ) {
-
+    Column(modifier = Modifier.padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
-            }
-            Text(titleText, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, null, tint = Color.White) }
+            Text(template.title, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
 
-        Divider(color = Color.Gray.copy(0.3f))
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                InputLabel("Your Name / Complainant")
-                CustomTextField(senderName) { senderName = it }
-            }
-
-            item {
-                val label = if (template == DraftingTemplate.FIR) "Police Station Name & Address" else "Recipient / Court Name"
-                InputLabel(label)
-                CustomTextField(recipientName) { recipientName = it }
-            }
-
-            item {
-                val label = if (template == DraftingTemplate.FIR) "Incident Details (Date, Time, Place, What happened)" else "Case Details / Notice Content"
-                InputLabel(label)
-                CustomTextField(details, isMultiLine = true) { details = it }
-            }
+        LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            item { DraftingField("Your Full Name", sender) { sender = it } }
+            item { DraftingField("Recipient/Court Name", recipient) { recipient = it } }
+            item { DraftingField("Details of Incident", details, true) { details = it } }
         }
 
         Button(
             onClick = {
-                val html = generateLegalHtml(template, senderName, recipientName, currentDate, details)
-                PdfGenerator.generatePdf(context, "${template.id}_$currentDate", html)
+                val html = "<h1>${template.title}</h1><p>Date: $date</p><p>From: $sender</p><p>To: $recipient</p><p>Details: $details</p>"
+                PdfGenerator.generatePdf(context, "Legal_Draft", html)
             },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().height(54.dp),
             colors = ButtonDefaults.buttonColors(containerColor = AccentGold),
-            enabled = senderName.isNotBlank() && recipientName.isNotBlank() && details.isNotBlank()
+            shape = RoundedCornerShape(12.dp),
+            enabled = sender.isNotBlank() && recipient.isNotBlank() && details.isNotBlank()
         ) {
-            Icon(Icons.Default.PictureAsPdf, contentDescription = null, tint = Color.Black)
+            Icon(Icons.Default.PictureAsPdf, null, tint = Color.Black)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Generate PDF", color = Color.Black)
+            Text("GENERATE & EXPORT PDF", color = Color.Black, fontWeight = FontWeight.Bold)
         }
     }
 }
 
 @Composable
-fun InputLabel(text: String) {
-    Text(text, color = AccentGold, fontSize = 12.sp, modifier = Modifier.padding(bottom = 4.dp, start = 4.dp))
-}
-
-@Composable
-fun CustomTextField(value: String, isMultiLine: Boolean = false, onValueChange: (String) -> Unit) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = Modifier.fillMaxWidth().height(if (isMultiLine) 150.dp else 60.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = AccentGold,
-            unfocusedBorderColor = Color.Gray,
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            cursorColor = AccentGold,
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent
-        ),
-        maxLines = if (isMultiLine) 10 else 1
-    )
-}
-
-fun generateLegalHtml(
-    template: DraftingTemplate,
-    sender: String,
-    recipient: String,
-    date: String,
-    details: String
-): String {
-    return when (template) {
-        DraftingTemplate.FIR -> """
-            <h1>Application for Registration of FIR</h1>
-            <p><b>Date:</b> $date</p>
-            <p><b>To, The Station House Officer (SHO),</b><br>$recipient</p>
-            
-            <h2>Subject: Formal complaint for registration of First Information Report (FIR).</h2>
-            
-            <div class='content'>
-                <p>Respected Sir/Madam,</p>
-                <p>I, <b>$sender</b>, wish to report a cognizable offense committed against me/in my presence. I request you to register an FIR under the relevant sections of the Bharatiya Nyaya Sanhita (BNS) based on the following facts:</p>
-                
-                <h3>Incident Details:</h3>
-                <p>$details</p>
-                
-                <p><b>Prayer:</b></p>
-                <p>In light of the facts mentioned above, it is requested that an FIR be registered immediately, and a copy of the same be provided to me free of cost as per my legal right.</p>
-            </div>
-            
-            <div class='signature'>
-                <p>Sincerely,</p>
-                <p><b>$sender</b></p>
-                <p>(Complainant)</p>
-            </div>
-        """
-        DraftingTemplate.Bail -> """
-            <h1>Application for Bail</h1>
-            <p><b>In The Court Of:</b> $recipient</p>
-            <p><b>Date:</b> $date</p>
-            <h2>In the matter of: $sender (Applicant)</h2>
-            <div class='content'>
-                <p>Most Respectfully Sheweth:</p>
-                <p>1. That the applicant is innocent and has been falsely implicated in the case.</p>
-                <p>2. Details of the case/allegation: $details</p>
-                <p>3. That the applicant undertakes to cooperate with the investigation and will attend the court hearings regularly.</p>
-                <p>It is therefore prayed that this Hon'ble Court may be pleased to grant bail to the applicant.</p>
-            </div>
-            <div class='signature'>
-                <p>Counsel for Applicant</p>
-            </div>
-        """
-        DraftingTemplate.Notice -> """
-            <h1>Legal Notice</h1>
-            <p><b>Date:</b> $date</p>
-            <p><b>From:</b> Advocate on behalf of $sender</p>
-            <p><b>To:</b> $recipient</p>
-            <h2>Subject: Legal Notice</h2>
-            <div class='content'>
-                <p>Sir/Madam,</p>
-                <p>Under instructions from my client <b>$sender</b>, I hereby serve you this legal notice:</p>
-                <p>$details</p>
-                <p>You are hereby called upon to comply with the demands of my client within 15 days of receipt of this notice, failing which appropriate legal action will be initiated against you.</p>
-            </div>
-            <div class='signature'>
-                <p>Advocate Signature</p>
-            </div>
-        """
-        else -> ""
+fun DraftingField(label: String, value: String, isLarge: Boolean = false, onValueChange: (String) -> Unit) {
+    Column {
+        Text(label, color = AccentGold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(6.6.dp))
+        OutlinedTextField(
+            value = value, onValueChange = onValueChange,
+            modifier = Modifier.fillMaxWidth().height(if(isLarge) 180.dp else 60.dp),
+            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedBorderColor = AccentGold),
+            shape = RoundedCornerShape(12.dp)
+        )
     }
 }

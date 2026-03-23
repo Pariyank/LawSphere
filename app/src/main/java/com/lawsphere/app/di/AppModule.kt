@@ -51,7 +51,7 @@ object AppModule {
     fun provideGeminiModel(): GenerativeModel {
         return GenerativeModel(
             modelName = "gemini-2.5-flash",
-            apiKey = "AIzaSyCBeph2v44ASUf6ivIt7sn07zbwRcl1VFA"
+            apiKey = "AIzaSyAQ1WiDnQ3skJCtIoGvSfQHC8k71YcVwNA"
         )
     }
 }
