@@ -69,7 +69,6 @@ class AuthRepository @Inject constructor(
 
     suspend fun signInWithGoogle(intent: Intent, selectedRole: String): Result<String> {
         return try {
-            // A. Google Auth
             val task = GoogleSignIn.getSignedInAccountFromIntent(intent)
             val account = task.await()
             val idToken = account.idToken ?: throw Exception("Google ID Token missing")
@@ -95,7 +94,6 @@ class AuthRepository @Inject constructor(
                 val storedRole = doc.getString("role")
                 if (storedRole != null && !storedRole.equals(selectedRole, ignoreCase = true)) {
                     auth.signOut()
-                    // Sign out of Google Client too to force re-selection next time if needed
                     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
                     GoogleSignIn.getClient(context, gso).signOut()
 

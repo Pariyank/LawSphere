@@ -40,7 +40,6 @@ import com.lawsphere.app.presentation.chat.GlassSurface
 import java.text.SimpleDateFormat
 import java.util.*
 
-// 🟢 Simplified View States
 enum class DraftingView {
     DASHBOARD, AI_CUSTOM_DRAFT, BNSS_FORMS_GALLERY
 }
@@ -184,7 +183,7 @@ fun BNSSFormsGalleryContent(onBack: () -> Unit) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text("FORM ${form.id}", color = AccentGold, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                                 Text(form.title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                Text(form.description, color = Color.Gray, fontSize = 12.sp, maxLines = 1)
+
                             }
                             IconButton(
                                 onClick = { FileDownloader.downloadPdf(context, form.storage_url, form.title) },

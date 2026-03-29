@@ -3,6 +3,7 @@ package com.lawsphere.app.presentation.main
 import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,8 +14,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
+import com.lawsphere.app.data.utils.BiometricHelper
 import com.lawsphere.app.domain.model.LawyerProfile
 import com.lawsphere.app.presentation.awareness.CitizenGuideScreen
 import com.lawsphere.app.presentation.awareness.MapsScreen
@@ -28,7 +32,7 @@ import com.lawsphere.app.presentation.drafting.DraftingScreen
 import com.lawsphere.app.presentation.explorer.CompareScreen
 import com.lawsphere.app.presentation.explorer.RoadmapScreen
 import com.lawsphere.app.presentation.explorer.SectionExplorerScreen
-import com.lawsphere.app.presentation.components.CoolNotificationPopup // 🟢 IMPORT POPUP
+import com.lawsphere.app.presentation.components.CoolNotificationPopup
 
 sealed class BottomNavItem(val title: String, val icon: ImageVector) {
     object Chat : BottomNavItem("Chat", Icons.Default.Chat)
@@ -40,18 +44,38 @@ sealed class BottomNavItem(val title: String, val icon: ImageVector) {
     object Profile : BottomNavItem("Me", Icons.Default.Person)
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun MainScreen(userRole: String, onLogout: () -> Unit) {
 
+    val context = LocalContext.current as FragmentActivity
+    val biometricHelper = remember { BiometricHelper(context) }
+
     val tabs = remember(userRole) {
         if (userRole.equals("lawyer", ignoreCase = true)) {
-            listOf(BottomNavItem.Chat, BottomNavItem.Explorer, BottomNavItem.Community, BottomNavItem.Drafting, BottomNavItem.Dashboard, BottomNavItem.Profile)
+            listOf(
+                BottomNavItem.Chat,
+                BottomNavItem.Explorer,
+                BottomNavItem.Community.apply{},
+                BottomNavItem.Drafting,
+                BottomNavItem.Dashboard,
+                BottomNavItem.Profile
+            )
         } else {
-            listOf(BottomNavItem.Chat, BottomNavItem.Explorer, BottomNavItem.Community, BottomNavItem.Drafting, BottomNavItem.Guide, BottomNavItem.Profile)
+            listOf(
+                BottomNavItem.Chat,
+                BottomNavItem.Explorer,
+                BottomNavItem.Community,
+                BottomNavItem.Drafting,
+                BottomNavItem.Guide,
+                BottomNavItem.Profile
+            )
         }
     }
 
     var currentTab by remember { mutableStateOf<BottomNavItem>(BottomNavItem.Chat) }
+
+
     var showMap by remember { mutableStateOf(false) }
     var showRoadmap by remember { mutableStateOf(false) }
     var showCompare by remember { mutableStateOf(false) }
@@ -66,16 +90,45 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
                 tonalElevation = 0.dp
             ) {
                 tabs.forEach { item ->
-                    val isSelected = currentTab == item && !showMap && !showRoadmap && !showCompare && (activeChatId == null)
+                    val isSelected = currentTab == item &&
+                            !showMap && !showRoadmap && !showCompare && (activeChatId == null)
+
                     NavigationBarItem(
                         selected = isSelected,
                         onClick = {
-                            currentTab = item
-                            showMap = false; showRoadmap = false; showCompare = false
-                            activeChatId = null; activeChatName = null
+                            if (item == BottomNavItem.Community || item == BottomNavItem.Dashboard) {
+                                if (biometricHelper.canAuthenticate()) {
+                                    biometricHelper.showBiometricPrompt(
+                                        onSuccess = {
+                                            currentTab = item
+                                            showMap = false; showRoadmap = false; showCompare = false
+                                            activeChatId = null; activeChatName = null
+                                        },
+                                        onError = {
+                                        }
+                                    )
+                                } else {
+                                    currentTab = item
+                                    showMap = false; showRoadmap = false; showCompare = false
+                                    activeChatId = null; activeChatName = null
+                                }
+                            } else {
+                                currentTab = item
+                                showMap = false; showRoadmap = false; showCompare = false
+                                activeChatId = null; activeChatName = null
+                            }
                         },
                         icon = { Icon(item.icon, contentDescription = item.title) },
-                        label = { if (isSelected) Text(item.title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                        label = {
+                            if (isSelected) {
+                                val labelText = if (item == BottomNavItem.Community) {
+                                    if (userRole.equals("lawyer", true)) "Inbox" else "Consult"
+                                } else {
+                                    item.title
+                                }
+                                Text(text = labelText, maxLines = 1)
+                            }
+                        },
                         alwaysShowLabel = false,
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = Color.Black,
@@ -89,10 +142,10 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
             }
         }
     ) { padding ->
+
         Surface(modifier = Modifier.fillMaxSize(), color = GlassDark) {
             Box(modifier = Modifier.padding(padding)) {
 
-                // 🟢 THE NOTIFICATION LAYER (Stays on top of everything)
                 CoolNotificationPopup()
 
                 AnimatedContent(
@@ -102,30 +155,16 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
                         val targetIdx = tabs.indexOf(targetState)
 
                         if (targetIdx > initialIdx) {
-                            // Slide Out to Left, Slide In from Right
-                            slideInHorizontally(
-                                initialOffsetX = { fullWidth -> fullWidth / 10 },
-                                animationSpec = tween(400, easing = FastOutSlowInEasing)
-                            ) + fadeIn(tween(300)) togetherWith
-                                    slideOutHorizontally(
-                                        targetOffsetX = { fullWidth -> -fullWidth / 10 },
-                                        animationSpec = tween(400, easing = FastOutSlowInEasing)
-                                    ) + fadeOut(tween(300))
+                            (slideInHorizontally(animationSpec = tween(400, easing = FastOutSlowInEasing), initialOffsetX = { it / 10 }) + fadeIn(tween(300)))
+                                .togetherWith(slideOutHorizontally(animationSpec = tween(400, easing = FastOutSlowInEasing), targetOffsetX = { -it / 10 }) + fadeOut(tween(300)))
                         } else {
-                            // Slide Out to Right, Slide In from Left
-                            slideInHorizontally(
-                                initialOffsetX = { fullWidth -> -fullWidth / 10 },
-                                animationSpec = tween(400, easing = FastOutSlowInEasing)
-                            ) + fadeIn(tween(300)) togetherWith
-                                    slideOutHorizontally(
-                                        targetOffsetX = { fullWidth -> fullWidth / 10 },
-                                        animationSpec = tween(400, easing = FastOutSlowInEasing)
-                                    ) + fadeOut(tween(300))
+                            (slideInHorizontally(animationSpec = tween(400, easing = FastOutSlowInEasing), initialOffsetX = { -it / 10 }) + fadeIn(tween(300)))
+                                .togetherWith(slideOutHorizontally(animationSpec = tween(400, easing = FastOutSlowInEasing), targetOffsetX = { it / 10 }) + fadeOut(tween(300)))
                         }.using(SizeTransform(clip = false))
                     },
-                    label = "TabTransition"
+                    label = "MainViewTransition"
                 ) { targetTab ->
-                    Box(modifier = Modifier.fillMaxSize()) {
+                    Box(modifier = Modifier.fillMaxSize().background(GlassDark)) {
                         when {
                             activeChatId != null && activeChatName != null -> {
                                 PrivateChatScreen(
@@ -137,6 +176,7 @@ fun MainScreen(userRole: String, onLogout: () -> Unit) {
                             showCompare -> CompareScreen(onBack = { showCompare = false })
                             showMap -> MapsScreen(onBack = { showMap = false })
                             showRoadmap -> RoadmapScreen(onBack = { showRoadmap = false })
+
                             else -> {
                                 when (targetTab) {
                                     BottomNavItem.Chat -> ChatScreen()

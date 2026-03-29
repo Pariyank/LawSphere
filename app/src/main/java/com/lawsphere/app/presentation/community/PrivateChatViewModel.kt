@@ -25,9 +25,7 @@ class PrivateChatViewModel @Inject constructor(
     fun loadMessages(otherUserId: String) {
         chatJob?.cancel()
         _messages.value = emptyList()
-
         val roomId = repository.getChatRoomId(otherUserId)
-
         chatJob = viewModelScope.launch {
             repository.getMessages(roomId).collect {
                 _messages.value = it

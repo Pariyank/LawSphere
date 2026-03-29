@@ -30,11 +30,11 @@ import com.google.gson.reflect.TypeToken
 fun OfflineLiteScreen(onBack: () -> Unit) {
     val context = LocalContext.current
 
-    val offlineSections = remember {
+    val offlineSections: List<BnsSection> = remember {
         try {
             val json = context.assets.open("offline_critical.json").bufferedReader().use { it.readText() }
             val type = object : TypeToken<List<BnsSection>>() {}.type
-            Gson().fromJson<List<BnsSection>>(json, type)
+            Gson().fromJson(json, type) ?: emptyList()
         } catch (e: Exception) {
             emptyList()
         }
@@ -46,7 +46,9 @@ fun OfflineLiteScreen(onBack: () -> Unit) {
     val filteredList = if (selectedCategory == "All") {
         offlineSections
     } else {
-        offlineSections.filter { it.category == selectedCategory }
+        offlineSections.filter { section ->
+            section.category == selectedCategory
+        }
     }
 
     Column(
@@ -96,8 +98,8 @@ fun OfflineLiteScreen(onBack: () -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(filteredList) { section ->
-                OfflineCard(section)
+            items(filteredList) { item ->
+                OfflineCard(item)
             }
         }
     }
@@ -105,25 +107,31 @@ fun OfflineLiteScreen(onBack: () -> Unit) {
 
 @Composable
 fun OfflineCard(section: BnsSection) {
+    val safeSectionNum = section.section ?: "N/A"
+    val safeTitle = section.title ?: "Unknown Title"
+    val safeDesc = section.description ?: "No description available."
+    val safePunish = section.punishment ?: "Refer to Act"
+    val safeCat = (section.category ?: "General").uppercase()
+
     Card(
         colors = CardDefaults.cardColors(containerColor = GlassSurface),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Bolt, contentDescription = null, tint = AccentGold, modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.Bolt, null, tint = AccentGold, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
-                    text = section.section ?: "N/A",
+                    text = safeSectionNum,
                     color = AccentGold,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = (section.category ?: "General").uppercase(),
+                    text = safeCat,
                     color = Color.Gray,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold
@@ -133,14 +141,14 @@ fun OfflineCard(section: BnsSection) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = section.title ?: "Unknown Title",
+                text = safeTitle,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
 
             Text(
-                text = section.description ?: "No description available.",
+                text = safeDesc,
                 color = Color.White.copy(0.8f),
                 fontSize = 14.sp,
                 modifier = Modifier.padding(vertical = 8.dp)
@@ -151,10 +159,9 @@ fun OfflineCard(section: BnsSection) {
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-
                 Text(
-                    text = "Penalty: ${section.punishment ?: "Refer to Act"}",
-                    color = Color(0xFFFF6B6B),
+                    text = "Penalty: $safePunish",
+                    color = Color(0xFFFF8A8A),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(8.dp)

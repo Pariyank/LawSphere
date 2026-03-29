@@ -26,7 +26,6 @@ class PrivateChatRepository @Inject constructor() {
 
     fun getInbox(): Flow<List<InboxItem>> = callbackFlow {
         val myId = currentUserId ?: return@callbackFlow
-
         val listener = db.collection("private_chats")
             .whereArrayContains("participants", myId)
             .addSnapshotListener { snapshot, error ->
@@ -34,43 +33,31 @@ class PrivateChatRepository @Inject constructor() {
                     close(error)
                     return@addSnapshotListener
                 }
-
                 val items = snapshot?.documents?.mapNotNull { doc ->
                     val participants = doc.get("participants") as? List<String> ?: emptyList()
                     val names = doc.get("names") as? Map<String, String> ?: emptyMap()
-
                     val otherId = participants.firstOrNull { it != myId } ?: ""
                     val otherName = names[otherId] ?: "Unknown User"
                     val lastMessage = doc.getString("lastMessage") ?: ""
                     val timestamp = doc.getLong("timestamp") ?: 0L
-
                     InboxItem(doc.id, otherId, otherName, lastMessage, timestamp)
                 }?.sortedByDescending { it.timestamp } ?: emptyList()
-
                 trySend(items)
             }
-
         awaitClose { listener.remove() }
     }
 
     fun getMessages(chatRoomId: String): Flow<List<PrivateMessage>> = callbackFlow {
-        val ref = db.collection("private_chats")
-            .document(chatRoomId)
-            .collection("messages")
-            .orderBy("timestamp", Query.Direction.ASCENDING)
-
+        val ref = db.collection("private_chats").document(chatRoomId).collection("messages").orderBy("timestamp", Query.Direction.ASCENDING)
         val listener = ref.addSnapshotListener { snapshot, error ->
             if (error != null) {
                 close(error)
                 return@addSnapshotListener
             }
-
             val myId = currentUserId ?: ""
-
             val msgs = snapshot?.toObjects(PrivateMessage::class.java)?.filter { msg ->
                 !msg.deletedBy.contains(myId)
             } ?: emptyList()
-
             trySend(msgs)
         }
         awaitClose { listener.remove() }
@@ -79,45 +66,21 @@ class PrivateChatRepository @Inject constructor() {
     suspend fun sendMessage(otherUserId: String, otherUserName: String, text: String) {
         val myId = currentUserId ?: return
         val roomId = getChatRoomId(otherUserId)
-
         val myDoc = db.collection("users").document(myId).get().await()
-        val myName = myDoc.getString("name") ?: "Citizen"
-
-        val message = PrivateMessage(
-            senderId = myId,
-            text = text,
-            timestamp = System.currentTimeMillis()
-        )
-
+        val myName = myDoc.getString("name") ?: "User"
+        val message = PrivateMessage(senderId = myId, text = text, timestamp = System.currentTimeMillis())
         db.collection("private_chats").document(roomId).collection("messages").add(message).await()
-
-        val roomData = hashMapOf(
-            "participants" to listOf(myId, otherUserId),
-            "names" to mapOf(myId to myName, otherUserId to otherUserName),
-            "lastMessage" to text,
-            "timestamp" to System.currentTimeMillis()
-        )
+        val roomData = hashMapOf("participants" to listOf(myId, otherUserId), "names" to mapOf(myId to myName, otherUserId to otherUserName), "lastMessage" to text, "timestamp" to System.currentTimeMillis())
         db.collection("private_chats").document(roomId).set(roomData, SetOptions.merge()).await()
     }
 
     suspend fun deleteForEveryone(chatRoomId: String, messageId: String) {
-        try {
-            db.collection("private_chats").document(chatRoomId)
-                .collection("messages").document(messageId)
-                .delete().await()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        db.collection("private_chats").document(chatRoomId).collection("messages").document(messageId).delete().await()
     }
 
     suspend fun deleteForMe(chatRoomId: String, messageId: String) {
-        try {
-            val myId = currentUserId ?: return
-            db.collection("private_chats").document(chatRoomId)
-                .collection("messages").document(messageId)
-                .update("deletedBy", FieldValue.arrayUnion(myId)).await()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        val myId = currentUserId ?: return
+        db.collection("private_chats").document(chatRoomId).collection("messages").document(messageId)
+            .update("deletedBy", FieldValue.arrayUnion(myId)).await()
     }
 }

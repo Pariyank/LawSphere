@@ -3,13 +3,30 @@ package com.lawsphere.app.domain.model
 import com.google.gson.annotations.SerializedName
 
 data class BnsSection(
-    val section: String? = "N/A",
-    val title: String? = "Unknown Title",
-    val description: String? = "No content found.",
-    val punishment: String? = "N/A",
-    val cognizable: String? = "N/A",
-    val bailable: String? = "N/A",
-    val chapter: String? = "General",
-    val cases: List<String>? = emptyList(),
-    val category: String? = "General"
+    @SerializedName("section")
+    val section: String? = "",
+
+    @SerializedName("title")
+    val title: String? = "",
+
+    @SerializedName("description")
+    val description: String? = "",
+
+    @SerializedName("punishment")
+    val punishment: String? = "",
+
+    @SerializedName("cognizable")
+    val cognizable: String? = "",
+
+    @SerializedName("bailable")
+    val bailable: String? = "",
+
+    @SerializedName("chapter")
+    val chapter: String? = "",
+
+    @SerializedName("cases")
+    val cases: List<String?>? = emptyList(),
+
+    @SerializedName("category")
+    val category: String? = ""
 )

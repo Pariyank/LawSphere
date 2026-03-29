@@ -23,21 +23,33 @@ class ExplorerViewModel @Inject constructor(
     private val _sections = MutableStateFlow<List<BnsSection>>(emptyList())
     val sections = _sections.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
-
-    // 🟢 NEW: State for Act Names loaded from File
     private val _availableActs = MutableStateFlow<List<String>>(emptyList())
     val availableActs = _availableActs.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+    private val fallbackActs = listOf(
+        "Bharatiya Nyaya Sanhita, 2023",
+        "Bharatiya Nagarik Suraksha Sanhita, 2023",
+        "Bharatiya Sakshya Adhiniyam, 2023",
+        "The Constitution of India",
+        "The Information Technology Act, 2000",
+        "Indian Contract Act, 1872"
+    )
+
     init {
-        loadActsFromFile()
+        loadActs()
     }
 
-    private fun loadActsFromFile() {
+    private fun loadActs() {
         viewModelScope.launch {
-            val acts = JsonParser.loadActList(context)
-            _availableActs.value = acts.sorted()
+            val loadedActs = JsonParser.loadActList(context)
+            if (loadedActs.isEmpty()) {
+                _availableActs.value = fallbackActs.sorted()
+            } else {
+                _availableActs.value = loadedActs.sorted()
+            }
         }
     }
 
@@ -47,18 +59,22 @@ class ExplorerViewModel @Inject constructor(
             _isLoading.value = true
             try {
                 _sections.value = emptyList()
-                val result = api.lookupSection(LookupRequest(actName, sectionNumber))
+
+                val res = api.lookupSection(LookupRequest(actName, sectionNumber))
 
                 val mappedSection = BnsSection(
-                    section = result.section ?: sectionNumber,
-                    title = result.title ?: "Section Details",
-                    description = result.description ?: "Content not available.",
-                    punishment = result.punishment ?: "N/A",
-                    cognizable = result.cognizable ?: "N/A",
-                    bailable = result.bailable ?: "N/A",
-                    chapter = result.chapter ?: "General"
+                    section = res.section ?: sectionNumber,
+                    title = res.title ?: "Section Details",
+                    description = res.description ?: "Statement not found.",
+                    punishment = res.punishment ?: "N/A",
+                    cognizable = res.cognizable ?: "N/A",
+                    bailable = res.bailable ?: "N/A",
+                    chapter = res.chapter ?: "General",
+                    cases = res.cases ?: emptyList()
                 )
+
                 _sections.value = listOf(mappedSection)
+
             } catch (e: Exception) {
                 _sections.value = emptyList()
             }
@@ -67,4 +83,5 @@ class ExplorerViewModel @Inject constructor(
     }
 
     fun clearResults() { _sections.value = emptyList() }
+    fun resetToLocal() { _sections.value = emptyList() }
 }

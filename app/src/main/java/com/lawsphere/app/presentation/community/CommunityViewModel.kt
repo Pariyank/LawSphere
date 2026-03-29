@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lawsphere.app.data.repository.CommunityRepository
 import com.lawsphere.app.data.repository.PrivateChatRepository
-import com.lawsphere.app.domain.model.ForumPost
 import com.lawsphere.app.domain.model.InboxItem
 import com.lawsphere.app.domain.model.LawyerProfile
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,42 +25,32 @@ class CommunityViewModel @Inject constructor(
     private val _inbox = MutableStateFlow<List<InboxItem>>(emptyList())
     val inbox = _inbox.asStateFlow()
 
-    private val _posts = MutableStateFlow<List<ForumPost>>(emptyList())
-    val posts = _posts.asStateFlow()
-
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-
     private var inboxJob: Job? = null
 
-    fun refreshData() {
-
-        _lawyers.value = emptyList()
-        _inbox.value = emptyList()
-        _posts.value = emptyList()
-
+    fun refreshData(userRole: String) {
         inboxJob?.cancel()
 
-        viewModelScope.launch {
-            _isLoading.value = true
-            repository.getLawyers().onSuccess { _lawyers.value = it }
-            repository.getPosts().onSuccess { _posts.value = it }
-            _isLoading.value = false
-        }
+        _isLoading.value = true
 
         inboxJob = viewModelScope.launch {
             privateChatRepository.getInbox().collect { items ->
                 _inbox.value = items
+                _isLoading.value = false
             }
         }
-    }
 
-    fun postQuestion(title: String, desc: String) {
-        viewModelScope.launch { repository.createPost(title, desc); refreshData() }
-    }
+        if (!userRole.equals("lawyer", ignoreCase = true)) {
+            viewModelScope.launch {
+                repository.getLawyers().onSuccess { _lawyers.value = it }
+            }
+        }
 
-    fun answerQuestion(postId: String, answer: String) {
-        viewModelScope.launch { repository.addAnswer(postId, answer); refreshData() }
+        viewModelScope.launch {
+            kotlinx.coroutines.delay(2000)
+            if (_isLoading.value) _isLoading.value = false
+        }
     }
 }
