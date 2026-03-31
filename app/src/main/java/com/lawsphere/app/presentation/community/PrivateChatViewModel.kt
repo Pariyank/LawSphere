@@ -53,4 +53,11 @@ class PrivateChatViewModel @Inject constructor(
             repository.deleteForMe(roomId, messageId)
         }
     }
+
+    fun markSeen(otherUserId: String, messageId: String) {
+        val roomId = repository.getChatRoomId(otherUserId)
+        viewModelScope.launch {
+            repository.markSeen(roomId, messageId)
+        }
+    }
 }

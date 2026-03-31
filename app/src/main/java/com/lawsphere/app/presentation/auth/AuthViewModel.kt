@@ -22,11 +22,10 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _authState.value = AuthState.Loading
             val result = repository.login(email, pass, role)
-            result.onSuccess {
-                _authState.value = AuthState.Success
-            }.onFailure {
-                _authState.value = AuthState.Error(it.message ?: "Login Failed")
-            }
+            _authState.value = result.fold(
+                onSuccess = { AuthState.Success },
+                onFailure = { AuthState.Error(it.message ?: "Login Failed") }
+            )
         }
     }
 
@@ -34,28 +33,24 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _authState.value = AuthState.Loading
             val result = repository.signup(email, pass, name, role)
-            result.onSuccess {
-                _authState.value = AuthState.Success
-            }.onFailure {
-                _authState.value = AuthState.Error(it.message ?: "Signup Failed")
-            }
+            _authState.value = result.fold(
+                onSuccess = { AuthState.Success },
+                onFailure = { AuthState.Error(it.message ?: "Signup Failed") }
+            )
         }
     }
 
-    fun getGoogleLoginIntent(): Intent {
-        return repository.getGoogleSignInIntent()
-    }
+    fun getGoogleLoginIntent(): Intent = repository.getGoogleSignInIntent()
 
     fun handleGoogleSignInResult(intent: Intent, role: String) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
             val result = repository.signInWithGoogle(intent, role)
 
-            result.onSuccess {
-                _authState.value = AuthState.Success
-            }.onFailure {
-                _authState.value = AuthState.Error(it.message ?: "Google Sign-In Failed")
-            }
+            _authState.value = result.fold(
+                onSuccess = { AuthState.Success },
+                onFailure = { AuthState.Error(it.message ?: "Google Sign-In Failed") }
+            )
         }
     }
 }

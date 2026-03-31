@@ -7,7 +7,11 @@ data class PrivateMessage(
     val senderId: String = "",
     val text: String = "",
     val timestamp: Long = System.currentTimeMillis(),
-    val deletedBy: List<String> = emptyList()
+
+    val deletedBy: List<String> = emptyList(),
+
+    val deliveredTo: List<String> = emptyList(),
+    val seenBy: List<String> = emptyList()
 )
 
 data class InboxItem(

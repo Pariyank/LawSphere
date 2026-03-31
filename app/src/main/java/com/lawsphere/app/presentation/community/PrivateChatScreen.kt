@@ -93,7 +93,19 @@ fun PrivateChatScreen(
         ) {
             items(messages) { msg ->
                 val isMe = msg.senderId == viewModel.currentUserId
-                MessageBubble(message = msg, isMe = isMe, onLongPress = { messageToDelete = msg })
+
+                LaunchedEffect(msg.id) {
+                    if (!isMe) {
+                        viewModel.markSeen(otherUserId, msg.id)
+                    }
+                }
+
+                MessageBubble(
+                    message = msg,
+                    isMe = isMe,
+                    currentUserId = viewModel.currentUserId,
+                    onLongPress = { messageToDelete = msg }
+                )
             }
         }
 
@@ -121,19 +133,75 @@ fun PrivateChatScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageBubble(message: PrivateMessage, isMe: Boolean, onLongPress: () -> Unit) {
-    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = if (isMe) Alignment.CenterEnd else Alignment.CenterStart) {
+fun MessageBubble(
+    message: PrivateMessage,
+    isMe: Boolean,
+    currentUserId: String?,
+    onLongPress: () -> Unit
+) {
+
+    val isDelivered = message.deliveredTo.size > 1
+    val isSeen = message.seenBy.size > 1
+
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = if (isMe) Alignment.CenterEnd else Alignment.CenterStart
+    ) {
         Column(
             modifier = Modifier
                 .widthIn(max = 280.dp)
-                .clip(if (isMe) RoundedCornerShape(12.dp, 12.dp, 2.dp, 12.dp) else RoundedCornerShape(12.dp, 12.dp, 12.dp, 2.dp))
+                .clip(
+                    if (isMe)
+                        RoundedCornerShape(12.dp, 12.dp, 2.dp, 12.dp)
+                    else
+                        RoundedCornerShape(12.dp, 12.dp, 12.dp, 2.dp)
+                )
                 .background(if (isMe) AccentGold else Color(0xFF333333))
                 .combinedClickable(onClick = {}, onLongClick = onLongPress)
                 .padding(12.dp)
         ) {
-            Text(message.text ?: "", color = if (isMe) Color.Black else Color.White, fontSize = 15.sp)
-            val time = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date(message.timestamp))
-            Text(time, color = if (isMe) Color.Black.copy(0.6f) else Color.Gray, fontSize = 10.sp, modifier = Modifier.align(Alignment.End))
+
+            Text(
+                message.text ?: "",
+                color = if (isMe) Color.Black else Color.White,
+                fontSize = 15.sp
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.align(Alignment.End)
+            ) {
+
+                val time = java.text.SimpleDateFormat(
+                    "hh:mm a",
+                    java.util.Locale.getDefault()
+                ).format(java.util.Date(message.timestamp))
+
+                Text(
+                    time,
+                    color = if (isMe) Color.Black.copy(0.6f) else Color.Gray,
+                    fontSize = 10.sp
+                )
+
+                if (isMe) {
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Text(
+                        text = when {
+                            isSeen -> "✔✔"
+                            isDelivered -> "✔✔"
+                            else -> "✔"
+                        },
+                        fontSize = 12.sp,
+                        color = when {
+                            isSeen -> Color(0xFF4FC3F7)
+                            else -> Color.Gray
+                        }
+                    )
+                }
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.lawsphere.app.di
 
+import com.lawsphere.app.BuildConfig
 import com.google.ai.client.generativeai.GenerativeModel
 import com.lawsphere.app.data.api.LawApi
 import dagger.Module
@@ -51,7 +52,7 @@ object AppModule {
     fun provideGeminiModel(): GenerativeModel {
         return GenerativeModel(
             modelName = "gemini-2.5-flash",
-            apiKey = "AIzaSyAQ1WiDnQ3skJCtIoGvSfQHC8k71YcVwNA"
+            apiKey = BuildConfig.GEMINI_API_KEY
         )
     }
 }

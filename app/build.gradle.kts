@@ -1,3 +1,4 @@
+import java.util.Properties
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -10,6 +11,18 @@ android {
     namespace = "com.lawsphere.app"
     compileSdk = 34
 
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(localPropertiesFile.inputStream())
+    }
+
+
     defaultConfig {
         applicationId = "com.lawsphere.app"
         minSdk = 26
@@ -21,6 +34,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField(
+            "String",
+            "GEMINI_API_KEY",
+            "\"${localProperties.getProperty("GEMINI_API_KEY") ?: ""}\""
+        )
     }
 
     buildTypes {
@@ -41,9 +59,7 @@ android {
         jvmTarget = "17"
     }
 
-    buildFeatures {
-        compose = true
-    }
+
 
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"

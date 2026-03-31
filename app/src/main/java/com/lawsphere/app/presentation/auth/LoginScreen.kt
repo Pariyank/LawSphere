@@ -1,6 +1,7 @@
 package com.lawsphere.app.presentation.auth
 
 import android.app.Activity
+import com.lawsphere.app.R
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,6 +19,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -181,7 +183,22 @@ fun LoginScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp)
                     ) {
-                        Text("Continue with Google", color = Color.White)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+
+                            Icon(
+                                painter = painterResource(R.drawable.google),
+                                contentDescription = "Google",
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(20.dp)
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Text("Continue with Google", color = Color.White)
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
