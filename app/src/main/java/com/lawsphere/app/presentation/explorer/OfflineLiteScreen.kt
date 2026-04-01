@@ -25,18 +25,36 @@ import com.lawsphere.app.presentation.chat.GlassDark
 import com.lawsphere.app.presentation.chat.GlassSurface
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.lawsphere.app.data.api.LawApi
 
 @Composable
-fun OfflineLiteScreen(onBack: () -> Unit) {
+fun OfflineLiteScreen(
+    onBack: () -> Unit,
+    api: LawApi
+) {
     val context = LocalContext.current
 
-    val offlineSections: List<BnsSection> = remember {
+    var offlineSections by remember {
+        mutableStateOf(
+            try {
+                val json = context.assets.open("offline_critical.json")
+                    .bufferedReader().use { it.readText() }
+                val type = object : TypeToken<List<BnsSection>>() {}.type
+                Gson().fromJson<List<BnsSection>>(json, type) ?: emptyList()
+            } catch (e: Exception) {
+                emptyList()
+            }
+        )
+    }
+
+    LaunchedEffect(Unit) {
         try {
-            val json = context.assets.open("offline_critical.json").bufferedReader().use { it.readText() }
-            val type = object : TypeToken<List<BnsSection>>() {}.type
-            Gson().fromJson(json, type) ?: emptyList()
+            val latestData = api.getRemoteOfflineData()
+            if (latestData.isNotEmpty()) {
+                offlineSections = latestData
+            }
         } catch (e: Exception) {
-            emptyList()
+
         }
     }
 
@@ -63,11 +81,25 @@ fun OfflineLiteScreen(onBack: () -> Unit) {
             }
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Offline Lite Mode", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        "Offline Lite Mode",
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Icon(Icons.Default.WifiOff, contentDescription = null, tint = Color.Green, modifier = Modifier.size(16.dp))
+                    Icon(
+                        Icons.Default.WifiOff,
+                        contentDescription = null,
+                        tint = Color.Green,
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
-                Text("Critical laws available without internet", color = Color.Gray, fontSize = 12.sp)
+                Text(
+                    "Critical laws available without internet",
+                    color = Color.Gray,
+                    fontSize = 12.sp
+                )
             }
         }
 

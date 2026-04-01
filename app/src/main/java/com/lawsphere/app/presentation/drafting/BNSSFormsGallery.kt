@@ -22,8 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.lawsphere.app.data.utils.FileDownloader
 import com.lawsphere.app.domain.model.LegalForm
 import com.lawsphere.app.presentation.chat.AccentGold
@@ -31,33 +30,37 @@ import com.lawsphere.app.presentation.chat.GlassDark
 import com.lawsphere.app.presentation.chat.GlassSurface
 
 @Composable
-fun BNSSFormsGallery(onBack: () -> Unit) {
+fun BNSSFormsGallery(
+    onBack: () -> Unit,
+    viewModel: DraftingViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
     var searchQuery by remember { mutableStateOf("") }
 
-    val allForms: List<LegalForm> = remember {
-        try {
-            val jsonString = context.assets.open("bnss_forms.json")
-                .bufferedReader().use { it.readText() }
-            val type = object : TypeToken<Map<String, List<LegalForm>>>() {}.type
-            val dataMap: Map<String, List<LegalForm>> = Gson().fromJson(jsonString, type)
-            dataMap["forms"] ?: emptyList()
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
+    val allForms by viewModel.forms.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     val filteredForms = allForms.filter {
         (it.title ?: "").contains(searchQuery, ignoreCase = true) ||
                 (it.category ?: "").contains(searchQuery, ignoreCase = true)
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(GlassDark).padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(GlassDark)
+            .padding(16.dp)
+    ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
             }
-            Text("Official BNSS Forms", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text(
+                "Official BNSS Forms",
+                color = Color.White,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -79,29 +82,43 @@ fun BNSSFormsGallery(onBack: () -> Unit) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        if (filteredForms.isEmpty()) {
+        if (isLoading && allForms.isEmpty()) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("No forms found.", color = Color.Gray)
+                CircularProgressIndicator(color = AccentGold)
             }
         } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(bottom = 100.dp)
-            ) {
-                itemsIndexed(filteredForms) { index, form ->
-                    var isVisible by remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) { isVisible = true }
+            if (filteredForms.isEmpty()) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("No forms found.", color = Color.Gray)
+                }
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(bottom = 100.dp)
+                ) {
+                    itemsIndexed(filteredForms) { index, form ->
+                        var isVisible by remember { mutableStateOf(false) }
+                        LaunchedEffect(Unit) { isVisible = true }
 
-                    AnimatedVisibility(
-                        visible = isVisible,
-                        enter = fadeIn(tween(300, index * 20)) + scaleIn(initialScale = 0.95f, animationSpec = tween(300, index * 20))
-                    ) {
-                        FormItemCard(
-                            form = form,
-                            onDownload = {
-                                FileDownloader.downloadPdf(context, form.storage_url ?: "", form.title ?: "Form")
-                            }
-                        )
+                        AnimatedVisibility(
+                            visible = isVisible,
+                            enter = fadeIn(tween(300, index * 20)) +
+                                    scaleIn(
+                                        initialScale = 0.95f,
+                                        animationSpec = tween(300, index * 20)
+                                    )
+                        ) {
+                            FormItemCard(
+                                form = form,
+                                onDownload = {
+                                    FileDownloader.downloadPdf(
+                                        context,
+                                        form.storage_url ?: "",
+                                        form.title ?: "Form"
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -119,7 +136,10 @@ fun FormItemCard(form: LegalForm, onDownload: () -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = GlassSurface),
         shape = RoundedCornerShape(16.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            Color.White.copy(alpha = 0.05f)
+        )
     ) {
         Row(
             modifier = Modifier.padding(16.dp),

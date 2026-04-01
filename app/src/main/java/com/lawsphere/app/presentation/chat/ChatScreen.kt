@@ -172,38 +172,61 @@ fun ChatScreen(
 fun ChatBubble(message: ChatMessage) {
     val isUser = message.isUser
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
-        verticalAlignment = Alignment.Bottom
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        contentAlignment = if (isUser) Alignment.CenterEnd else Alignment.CenterStart
     ) {
-        if (!isUser) {
-            Box(
-                modifier = Modifier
-                    .size(28.dp)
-                    .background(GlassSurface, CircleShape)
-                    .border(1.dp, AccentGold.copy(alpha = 0.5f), CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Default.Scale, "AI", tint = AccentGold, modifier = Modifier.size(16.dp))
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-        }
-
-        Column(
-            modifier = Modifier
-                .widthIn(max = 300.dp)
-                .clip(
-                    if (isUser) RoundedCornerShape(18.dp, 18.dp, 2.dp, 18.dp)
-                    else RoundedCornerShape(18.dp, 18.dp, 18.dp, 2.dp)
-                )
-                .background(if (isUser) AccentGold else GlassSurface)
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+        Row(
+            verticalAlignment = Alignment.Top,
+            modifier = Modifier.widthIn(max = 340.dp)
         ) {
-            if (isUser) {
-                Text(text = message.text, color = Color.Black, style = MaterialTheme.typography.bodyMedium)
-            } else {
-                MarkdownText(markdown = message.text, color = Color.White, style = MaterialTheme.typography.bodyMedium)
+            if (!isUser) {
+                Box(
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .size(32.dp)
+                        .background(GlassSurface, CircleShape)
+                        .border(1.dp, AccentGold.copy(alpha = 0.5f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.Scale, null, tint = AccentGold, modifier = Modifier.size(16.dp))
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+            }
+
+            Card(
+                modifier = Modifier.weight(1f, fill = false),
+                shape = if (isUser)
+                    RoundedCornerShape(20.dp, 20.dp, 2.dp, 20.dp)
+                else
+                    RoundedCornerShape(2.dp, 20.dp, 20.dp, 20.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isUser) AccentGold else Color(0xFF1E1E1E)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = if(isUser) 2.dp else 4.dp),
+                border = if(!isUser) androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)) else null
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    if (isUser) {
+                        Text(
+                            text = message.text,
+                            color = Color.Black,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium
+                        )
+                    } else {
+                        MarkdownText(
+                            markdown = message.text,
+                            color = Color.White,
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                lineHeight = 22.sp,
+                                letterSpacing = 0.5.sp
+                            )
+                        )
+                    }
+                }
             }
         }
     }

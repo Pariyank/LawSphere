@@ -44,12 +44,17 @@ class ExplorerViewModel @Inject constructor(
 
     private fun loadActs() {
         viewModelScope.launch {
-            val loadedActs = JsonParser.loadActList(context)
-            if (loadedActs.isEmpty()) {
-                _availableActs.value = fallbackActs.sorted()
-            } else {
-                _availableActs.value = loadedActs.sorted()
-            }
+            val localActs = JsonParser.loadActList(context)
+            _availableActs.value = localActs.sorted()
+
+            try {
+                val remoteResponse = api.getRemoteActList()
+                val remoteActs = remoteResponse["acts"] ?: emptyList()
+                if (remoteActs.isNotEmpty()) {
+                    _availableActs.value = remoteActs.sorted()
+
+                }
+            } catch (e: Exception) { }
         }
     }
 

@@ -28,6 +28,9 @@ import com.lawsphere.app.presentation.chat.GlassSurface
 import com.lawsphere.app.presentation.explorer.OfflineLiteScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.lawsphere.app.data.api.LawApi
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -51,8 +54,19 @@ fun ProfileScreen(onLogout: () -> Unit) {
         }
     }
 
+    val api = remember {
+        Retrofit.Builder()
+            .baseUrl("https://lawsphere-backend-xvr1.onrender.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(LawApi::class.java)
+    }
+
     if (showOfflineMode) {
-        OfflineLiteScreen(onBack = { showOfflineMode = false })
+        OfflineLiteScreen(
+            onBack = { showOfflineMode = false },
+            api = api
+        )
         return
     }
 

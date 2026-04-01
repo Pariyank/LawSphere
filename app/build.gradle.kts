@@ -2,7 +2,7 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("kotlin-kapt") 
+    id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
 }
@@ -22,13 +22,12 @@ android {
         localProperties.load(localPropertiesFile.inputStream())
     }
 
-
     defaultConfig {
         applicationId = "com.lawsphere.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 5
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -59,8 +58,6 @@ android {
         jvmTarget = "17"
     }
 
-
-
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
@@ -69,18 +66,20 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+        jniLibs {
+            useLegacyPackaging = false
+        }
     }
 }
 
 dependencies {
-   
+
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
 
     implementation("androidx.credentials:credentials:1.2.2")
     implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
-
 
     implementation(platform("androidx.compose:compose-bom:2024.02.00"))
     implementation("androidx.compose.ui:ui")
@@ -116,7 +115,7 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.3.1")
     implementation("androidx.camera:camera-view:1.3.1")
 
-    implementation("com.google.mlkit:text-recognition:16.0.0")
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
 
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
