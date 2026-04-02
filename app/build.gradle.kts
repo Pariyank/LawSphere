@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.lawsphere.app"
-    compileSdk = 34
+    compileSdk = 36
 
     buildFeatures {
         compose = true
@@ -28,6 +28,10 @@ android {
         targetSdk = 35
         versionCode = 5
         versionName = "1.0"
+
+        ndk {
+            abiFilters += listOf("arm64-v8a")
+        }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -115,7 +119,7 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.3.1")
     implementation("androidx.camera:camera-view:1.3.1")
 
-    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
 
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
