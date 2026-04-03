@@ -59,9 +59,12 @@ fun SectionExplorerScreen(
     val sheetState = rememberModalBottomSheetState()
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize().background(GlassDark),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(GlassDark),
         contentPadding = PaddingValues(16.dp)
     ) {
+
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.MenuBook, null, tint = AccentGold, modifier = Modifier.size(28.dp))
@@ -106,7 +109,8 @@ fun SectionExplorerScreen(
 
         item {
             OutlinedTextField(
-                value = secNum, onValueChange = { secNum = it },
+                value = secNum,
+                onValueChange = { secNum = it },
                 placeholder = { Text("Section/Article Number", color = Color.Gray) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -149,12 +153,17 @@ fun SectionExplorerScreen(
             itemsIndexed(sections) { index, section ->
                 var visible by remember { mutableStateOf(false) }
                 LaunchedEffect(Unit) { visible = true }
-                AnimatedVisibility(visible = visible, enter = fadeIn(tween(500, index * 100)) + slideInVertically(tween(500, index * 100))) {
-                    SectionCard(section, selectedAct)
+
+                AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn(tween(500, index * 100)) + slideInVertically(tween(500, index * 100))
+                ) {
+                    SectionResultCard(section, selectedAct)
                 }
                 Spacer(modifier = Modifier.height(12.dp))
             }
         }
+
         item { Spacer(modifier = Modifier.height(100.dp)) }
     }
 
@@ -173,43 +182,99 @@ fun SectionExplorerScreen(
 }
 
 @Composable
-fun SectionCard(section: BnsSection, actName: String) {
-    var expanded by remember { mutableStateOf(false) }
+fun SectionResultCard(section: BnsSection, actName: String) {
+    var expanded by remember { mutableStateOf(true) }
+
     val safeSection = (section.section ?: "N/A").ifBlank { "N/A" }
-    val description = section.description ?: ""
+    val safeTitle = (section.title ?: "Details").ifBlank { "Section Details" }
+    val safeDescription = (section.description ?: "").trim()
+
 
     Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .animateContentSize()
+            .clickable { expanded = !expanded },
         colors = CardDefaults.cardColors(containerColor = GlassSurface),
         shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().animateContentSize().clickable { expanded = !expanded }
+        border = borderStroke()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
             Row(verticalAlignment = Alignment.Top) {
                 Surface(color = AccentGold, shape = RoundedCornerShape(8.dp)) {
-                    Text("Sec $safeSection", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 12.sp, modifier = Modifier.padding(6.dp))
+                    Text(
+                        text = "$safeSection",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(6.dp)
+                    )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = section.title ?: "Section", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(text = safeTitle, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     Text(text = actName, color = Color.Gray, fontSize = 11.sp, maxLines = 1)
                 }
                 Icon(imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = Color.Gray)
             }
+
             if (expanded) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 Divider(color = Color.White.copy(0.1f))
-                Spacer(modifier = Modifier.height(12.dp))
-                if (description.isNotBlank()) {
-                    MarkdownText(markdown = description, color = Color.White.copy(0.9f))
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text("EXACT STATEMENT", color = AccentGold, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(4.dp))
+
+                if (safeDescription.isNotBlank()) {
+                    MarkdownText(markdown = safeDescription, color = Color.White.copy(0.9f))
+                } else {
+                    Text("No description available.", color = Color.Gray, fontSize = 14.sp)
                 }
-                Spacer(modifier = Modifier.height(12.dp))
-                Surface(color = Color.DarkGray, shape = RoundedCornerShape(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    Text("Punishment: ${section.punishment ?: "Refer to Act"}", color = Color.White, modifier = Modifier.padding(12.dp), fontSize = 13.sp)
-                }
+
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Red.copy(0.1f), RoundedCornerShape(8.dp))
+                        .padding(12.dp)
+                )
             }
         }
     }
 }
+
+@Composable
+fun LegalTag(label: String, value: String) {
+    val color = if (value.equals("Yes", true)) Color(0xFF4CAF50)
+    else if (value.equals("No", true)) Color(0xFFFF5252)
+    else Color.Gray
+    Column {
+        Text(text = label, color = Color.Gray, fontSize = 11.sp)
+        Text(text = value, color = color, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+fun ToolCard(title: String, icon: ImageVector, color: Color, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Card(
+        onClick = onClick,
+        modifier = modifier.height(65.dp),
+        colors = CardDefaults.cardColors(containerColor = GlassSurface),
+        shape = RoundedCornerShape(12.dp),
+        border = borderStroke()
+    ) {
+        Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+            Icon(icon, null, tint = color, modifier = Modifier.size(20.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        }
+    }
+}
+
+private fun borderStroke() = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(0.05f))
 
 @Composable
 fun ActPickerContent(allActs: List<String>, onSelect: (String) -> Unit) {
@@ -220,89 +285,47 @@ fun ActPickerContent(allActs: List<String>, onSelect: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxHeight(0.85f)
-            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+            .padding(16.dp)
             .navigationBarsPadding()
     ) {
-        Text(
-            text = "Search Act",
-            color = Color.White,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
+        Text("Search Act", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
-            value = query,
-            onValueChange = { query = it; limit = 20 },
+            value = query, onValueChange = { query = it; limit = 20 },
             placeholder = { Text("Type Act Name...", color = Color.Gray) },
             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)),
             leadingIcon = { Icon(Icons.Default.Search, null, tint = AccentGold) },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                focusedBorderColor = AccentGold,
-                unfocusedBorderColor = Color.White.copy(0.1f)
+                focusedTextColor = Color.White, unfocusedTextColor = Color.White,
+                focusedBorderColor = AccentGold, unfocusedBorderColor = Color.White.copy(0.1f)
             ),
             singleLine = true
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(bottom = 32.dp)
-        ) {
+        LazyColumn(modifier = Modifier.weight(1f)) {
             itemsIndexed(filtered.take(limit)) { _, act ->
                 Text(
-                    text = act,
-                    color = Color.White,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onSelect(act) }
-                        .padding(16.dp),
+                    text = act, color = Color.White,
+                    modifier = Modifier.fillMaxWidth().clickable { onSelect(act) }.padding(16.dp),
                     fontSize = 14.sp
                 )
                 Divider(color = Color.White.copy(0.05f))
             }
-
             if (filtered.size > limit) {
                 item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp),
-                        contentAlignment = Alignment.Center
+                    TextButton(
+                        onClick = { limit += 20 },
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.textButtonColors(containerColor = AccentGold.copy(0.1f))
                     ) {
-                        TextButton(
-                            onClick = { limit += 20 },
-                            modifier = Modifier
-                                .fillMaxWidth(0.8f)
-                                .height(50.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.textButtonColors(
-                                containerColor = AccentGold.copy(alpha = 0.1f)
-                            )
-                        ) {
-                            Text("See More Acts...", color = AccentGold, fontWeight = FontWeight.Bold)
-                        }
+                        Text("See More Acts...", color = AccentGold, fontWeight = FontWeight.Bold)
                     }
                 }
             }
-
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-        }
-    }
-}
-
-@Composable
-fun ToolCard(title: String, icon: ImageVector, color: Color, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Card(onClick = onClick, modifier = modifier.height(65.dp), colors = CardDefaults.cardColors(containerColor = GlassSurface), shape = RoundedCornerShape(12.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(0.05f))) {
-        Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-            Icon(icon, null, tint = color, modifier = Modifier.size(20.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
         }
     }
 }
